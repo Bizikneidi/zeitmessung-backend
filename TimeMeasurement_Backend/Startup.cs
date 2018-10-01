@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Net.WebSockets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using TimeMeasurement_Backend.Handlers;
 
 namespace TimeMeasurement_Backend
 {
@@ -33,6 +29,37 @@ namespace TimeMeasurement_Backend
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseWebSockets();
+            //Register Custom Connection Handling
+            app.Use(async (context, next) =>
+            {
+                //Get request path
+                var path = context.Request.Path.Value.Split('/');
+                //Check if request is WS and path requestPath has value
+                if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
+                {
+                    //admin / station / viewer
+                    string requestPath = path[1].ToLower();
+                    //get connected websocket
+                    var ws = await context.WebSockets.AcceptWebSocketAsync();
+                    switch (requestPath) {
+                        case "admin": {
+                            break;
+                        }
+                        case "station":
+                            await StationHandler.Instance.SetStation(ws);
+                            break;
+                        case "viewer":
+                            break;
+                    }
+                }
+                else
+                {
+                    //Pass to next handler (registered by ASP)
+                    await next.Invoke();
+                }
+            });
 
             app.UseMvc();
         }
