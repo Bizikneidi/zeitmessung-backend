@@ -1,44 +1,38 @@
 ﻿using System;
-using System.Linq;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace TimeMeasurement_Backend.Handlers
 {
-    public class StationHandler
+    /// <summary>
+    /// Handles websocket connection with a station
+    /// </summary>
+    public class StationHandler : Handler<StationHandler.Command>
     {
+        public enum Command
+        {
+            Start, //Station should start measuring time
+            StartTime, //Message contains start time
+            EndTime //Message contains end time
+        }
+
         public static StationHandler Instance { get; } = new StationHandler();
 
-        private WebSocket _websocket;
+        private WebSocket _station;
 
         /// <summary>
         /// Send a start signal to the station to tell it to start measuring the time
         /// </summary>
         public void SendStartSignal()
         {
-            //Station has not yet connected
-            if (_websocket == null)
+            //Construct start signal message
+            var toSend = new Message<Command>
             {
-                return;
-            }
-
-            var toSend = new Message
-            {
-                Cmd = Message.Command.Start,
+                Command = Command.Start,
                 Data = null //No data
             };
-
-            //Convert Message to JSON, then to byte[]
-            var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(toSend));
-            _websocket.SendAsync(
-                new ArraySegment<byte>(data, 0, data.Count(b => b != 0)), //Arraysegment with length of not 0 bytes
-                WebSocketMessageType.Text,
-                true, //Message is not split
-                CancellationToken.None
-            );
+            //Send in task because of async
+            Task.Run(() => SendMessageAsync(_station, toSend));
         }
 
         /// <summary>
@@ -48,65 +42,23 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         public async Task SetStation(WebSocket ws)
         {
-            _websocket = ws;
-
-            while (true)
-            {
-                //wait for input and read data into buffer
-                var receiveBuffer = new byte[4096];
-                var rs = await ws.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-
-                //Connection is being closed
-                if (rs.CloseStatus.HasValue)
-                {
-                    //Close and exit
-                    await ws.CloseAsync(rs.CloseStatus.Value, rs.CloseStatusDescription, CancellationToken.None);
-                    _websocket = null;
-                    return;
-                }
-                //Convert reveived data to JSON string, then to Message
-                var received = JsonConvert.DeserializeObject<Message>(Encoding.UTF8.GetString(receiveBuffer));
-                HandleMessage(received);
-            }
+            _station = ws;
+            await ListenAsync(_station);
         }
 
-        /// <summary>
-        /// Process received messages
-        /// </summary>
-        /// <param name="message"></param>
-        private void HandleMessage(Message message)
+        protected override void HandleMessage(WebSocket sender, Message<Command> received)
         {
-            switch (message.Cmd)
+            switch (received.Command)
             {
-                case Message.Command.StartTime:
+                case Command.StartTime:
                     //Station has sent start time
                     break;
-                case Message.Command.EndTime:
+                case Command.EndTime:
                     //Station has sent end time
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        public class Message
-        {
-            public enum Command
-            {
-                Start, //Station should start measuring time
-                StartTime, //Message contains start time
-                EndTime //Message contains end time
-            }
-
-            /// <summary>
-            /// Command used to identify purpose of Message 
-            /// </summary>
-            public Command Cmd { get; set; }
-
-            /// <summary>
-            /// The "Arguments" which come with the command
-            /// </summary>
-            public object Data { get; set; }
         }
     }
 }

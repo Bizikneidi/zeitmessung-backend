@@ -1,5 +1,4 @@
-﻿using System.Net.WebSockets;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,10 +42,11 @@ namespace TimeMeasurement_Backend
                     string requestPath = path[1].ToLower();
                     //get connected websocket
                     var ws = await context.WebSockets.AcceptWebSocketAsync();
+                    //Pass ws to correct handler
                     switch (requestPath) {
-                        case "admin": {
+                        case "admin":
+                            await AdminHandler.Instance.SetAdmin(ws);
                             break;
-                        }
                         case "station":
                             await StationHandler.Instance.SetStation(ws);
                             break;
