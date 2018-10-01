@@ -6,9 +6,9 @@ namespace TimeMeasurement_Backend.Handlers
     /// <summary>
     /// Handles websocket connections with multiple viewers
     /// </summary>
-    public class ViewerHandler : Handler<ViewerHandler.Command>
+    public class ViewerHandler : Handler<ViewerHandler.Commands>
     {
-        public enum Command
+        public enum Commands
         {
             //TODO
         }
@@ -26,7 +26,7 @@ namespace TimeMeasurement_Backend.Handlers
             await ListenAsync(viewer);
         }
 
-        protected override void HandleMessage(WebSocket sender, Message<Command> received)
+        protected override void HandleMessage(WebSocket sender, Message<Commands> received)
         {
             //TODO
         }

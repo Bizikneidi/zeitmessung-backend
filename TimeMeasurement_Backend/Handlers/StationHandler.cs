@@ -7,9 +7,9 @@ namespace TimeMeasurement_Backend.Handlers
     /// <summary>
     /// Handles websocket connection with a station
     /// </summary>
-    public class StationHandler : Handler<StationHandler.Command>
+    public class StationHandler : Handler<StationHandler.Commands>
     {
-        public enum Command
+        public enum Commands
         {
             Start, //Station should start measuring time
             StartTime, //Message contains start time
@@ -29,9 +29,9 @@ namespace TimeMeasurement_Backend.Handlers
         public void SendStartSignal()
         {
             //Construct start signal message
-            var toSend = new Message<Command>
+            var toSend = new Message<Commands>
             {
-                Command = Command.Start,
+                Command = Commands.Start,
                 Data = null //No data
             };
             //Send in task because of async
@@ -55,14 +55,14 @@ namespace TimeMeasurement_Backend.Handlers
             await ListenAsync(_station);
         }
 
-        protected override void HandleMessage(WebSocket sender, Message<Command> received)
+        protected override void HandleMessage(WebSocket sender, Message<Commands> received)
         {
             switch (received.Command)
             {
-                case Command.StartTime:
+                case Commands.StartTime:
                     //TODO Station has sent start time
                     break;
-                case Command.EndTime:
+                case Commands.EndTime:
                     //TODO Station has sent end time
                     break;
                 default:

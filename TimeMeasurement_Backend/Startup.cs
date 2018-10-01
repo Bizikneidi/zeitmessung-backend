@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TimeMeasurement_Backend.Handlers;
+using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend
 {
@@ -18,6 +19,12 @@ namespace TimeMeasurement_Backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            //Make sure database is up and running
+            using (var ctx = new TimeMeasurementDbContext())
+            {
+                ctx.Database.EnsureCreated();
             }
 
             app.UseWebSockets();

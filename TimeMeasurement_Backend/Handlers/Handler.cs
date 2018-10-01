@@ -28,6 +28,12 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         protected async Task ListenAsync(WebSocket ws)
         {
+            //ws must not be null
+            if (ws == null)
+            {
+                return;
+            }
+
             while (true)
             {
                 //wait for input and read data into buffer
@@ -56,6 +62,7 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         protected async Task SendMessageAsync(WebSocket receiver, Message<TCommands> toSend)
         {
+            //receiver must not be null
             if (receiver == null)
             {
                 return;

@@ -7,9 +7,9 @@ namespace TimeMeasurement_Backend.Handlers
     /// <summary>
     /// Handles websocket connection with an admin
     /// </summary>
-    public class AdminHandler : Handler<AdminHandler.Command>
+    public class AdminHandler : Handler<AdminHandler.Commands>
     {
-        public enum Command
+        public enum Commands
         {
             Start //Station should start measuring time
         }
@@ -38,9 +38,9 @@ namespace TimeMeasurement_Backend.Handlers
             await ListenAsync(_admin);
         }
 
-        protected override void HandleMessage(WebSocket sender, Message<Command> received)
+        protected override void HandleMessage(WebSocket sender, Message<Commands> received)
         {
-            if (received.Command == Command.Start)
+            if (received.Command == Commands.Start)
             {
                 //Tell station to start measuring time
                 StationHandler.Instance.SendStartSignal();
