@@ -1,21 +1,14 @@
-﻿using System;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
+using TimeMeasurement_Backend.Handlers.Messaging;
 
 namespace TimeMeasurement_Backend.Handlers
 {
     /// <summary>
     /// Handles websocket connection with a station
     /// </summary>
-    public class StationHandler : Handler<StationHandler.Command>
+    public class StationHandler : Handler<StationCommands>
     {
-        public enum Command
-        {
-            Start, //Station should start measuring time
-            StartTime, //Message contains start time
-            EndTime //Message contains end time
-        }
-
         /// <summary>
         /// The weboscket corresponding to the station
         /// </summary>
@@ -29,21 +22,21 @@ namespace TimeMeasurement_Backend.Handlers
         public void SendStartSignal()
         {
             //Construct start signal message
-            var toSend = new Message<Command>
+            var toSend = new Message<StationCommands>
             {
-                Command = Command.Start,
+                Command = StationCommands.Start,
                 Data = null //No data
             };
             //Send in task because of async
-            Task.Run(() => SendMessageAsync(_station, toSend));
+            Task.Run(async () => await SendMessageAsync(_station, toSend));
         }
 
         /// <summary>
         /// Connect with station and listen for its messages
         /// </summary>
-        /// <param name="ws">The Websocket corrresponding to the station</param>
+        /// <param name="ws">The Websocket corresponding to the station</param>
         /// <returns></returns>
-        public async Task SetStation(WebSocket ws)
+        public async Task SetStationAsync(WebSocket ws)
         {
             //Something has already connected as a station
             if (_station != null)
@@ -55,18 +48,19 @@ namespace TimeMeasurement_Backend.Handlers
             await ListenAsync(_station);
         }
 
-        protected override void HandleMessage(WebSocket sender, Message<Command> received)
+        protected override void HandleMessage(WebSocket sender, Message<StationCommands> received)
         {
             switch (received.Command)
             {
-                case Command.StartTime:
+                case StationCommands.StartTime:
                     //TODO Station has sent start time
                     break;
-                case Command.EndTime:
+                case StationCommands.EndTime:
                     //TODO Station has sent end time
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    //Command does not exist
+                    return;
             }
         }
     }

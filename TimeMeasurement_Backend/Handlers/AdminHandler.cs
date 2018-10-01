@@ -1,19 +1,14 @@
-﻿using System;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
+using TimeMeasurement_Backend.Handlers.Messaging;
 
 namespace TimeMeasurement_Backend.Handlers
 {
     /// <summary>
     /// Handles websocket connection with an admin
     /// </summary>
-    public class AdminHandler : Handler<AdminHandler.Command>
+    public class AdminHandler : Handler<AdminCommands>
     {
-        public enum Command
-        {
-            Start //Station should start measuring time
-        }
-
         /// <summary>
         /// The weboscket corresponding to the admin
         /// </summary>
@@ -26,7 +21,7 @@ namespace TimeMeasurement_Backend.Handlers
         /// </summary>
         /// <param name="admin">The Websocket corrresponding to the admin</param>
         /// <returns></returns>
-        public async Task SetAdmin(WebSocket admin)
+        public async Task SetAdminAsync(WebSocket admin)
         {
             //Someone has already connected as admin
             if (_admin != null)
@@ -38,16 +33,12 @@ namespace TimeMeasurement_Backend.Handlers
             await ListenAsync(_admin);
         }
 
-        protected override void HandleMessage(WebSocket sender, Message<Command> received)
+        protected override void HandleMessage(WebSocket sender, Message<AdminCommands> received)
         {
-            if (received.Command == Command.Start)
+            if (received.Command == AdminCommands.Start)
             {
                 //Tell station to start measuring time
                 StationHandler.Instance.SendStartSignal();
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException();
             }
         }
     }

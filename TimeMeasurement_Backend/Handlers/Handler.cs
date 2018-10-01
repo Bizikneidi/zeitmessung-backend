@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using TimeMeasurement_Backend.Handlers.Messaging;
 
 namespace TimeMeasurement_Backend.Handlers
 {
@@ -28,6 +29,12 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         protected async Task ListenAsync(WebSocket ws)
         {
+            //ws must not be null
+            if (ws == null)
+            {
+                return;
+            }
+
             while (true)
             {
                 //wait for input and read data into buffer
@@ -56,6 +63,7 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         protected async Task SendMessageAsync(WebSocket receiver, Message<TCommands> toSend)
         {
+            //receiver must not be null
             if (receiver == null)
             {
                 return;

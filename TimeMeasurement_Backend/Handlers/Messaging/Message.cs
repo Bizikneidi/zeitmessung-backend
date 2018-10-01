@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace TimeMeasurement_Backend.Handlers
+namespace TimeMeasurement_Backend.Handlers.Messaging
 {
     /// <summary>
-    /// Used to send Commands and Data between webosckets, (is therefor converted to JSON)
+    /// Used to send Commands and Data between websockets, (is therefor converted to JSON)
     /// </summary>
     /// <typeparam name="TCommands">The available commands</typeparam>
     public class Message<TCommands> where TCommands : Enum

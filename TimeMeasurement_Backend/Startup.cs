@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TimeMeasurement_Backend.Handlers;
+using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend
 {
@@ -18,6 +19,12 @@ namespace TimeMeasurement_Backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            //Make sure database is up and running
+            using (var ctx = new TimeMeasurementDbContext())
+            {
+                ctx.Database.EnsureCreated();
             }
 
             app.UseWebSockets();
@@ -37,13 +44,13 @@ namespace TimeMeasurement_Backend
                     switch (requestPath)
                     {
                         case "admin":
-                            await AdminHandler.Instance.SetAdmin(ws);
+                            await AdminHandler.Instance.SetAdminAsync(ws);
                             break;
                         case "station":
-                            await StationHandler.Instance.SetStation(ws);
+                            await StationHandler.Instance.SetStationAsync(ws);
                             break;
                         case "viewer":
-                            await ViewerHandler.Instance.AddViewer(ws);
+                            await ViewerHandler.Instance.AddViewerAsync(ws);
                             break;
                     }
                 }
