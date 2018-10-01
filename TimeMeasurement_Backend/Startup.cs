@@ -44,13 +44,13 @@ namespace TimeMeasurement_Backend
                     switch (requestPath)
                     {
                         case "admin":
-                            await AdminHandler.Instance.SetAdmin(ws);
+                            await AdminHandler.Instance.SetAdminAsync(ws);
                             break;
                         case "station":
-                            await StationHandler.Instance.SetStation(ws);
+                            await StationHandler.Instance.SetStationAsync(ws);
                             break;
                         case "viewer":
-                            await ViewerHandler.Instance.AddViewer(ws);
+                            await ViewerHandler.Instance.AddViewerAsync(ws);
                             break;
                     }
                 }

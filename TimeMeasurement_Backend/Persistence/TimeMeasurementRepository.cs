@@ -40,20 +40,6 @@ namespace TimeMeasurement_Backend.Persistence
         }
 
         /// <summary>
-        /// Update in DB (if exists)
-        /// </summary>
-        /// <param name="item">object to update</param>
-        public void Update(T item)
-        {
-            using (var db = new TimeMeasurementDbContext())
-            {
-                db.Set<T>().Attach(item);
-                db.Entry(item).State = EntityState.Modified;
-                db.SaveChanges();
-            }
-        }
-
-        /// <summary>
         /// Get Objects from the DB
         /// </summary>
         /// <param name="predicate">The WHERE clause</param>
@@ -64,6 +50,20 @@ namespace TimeMeasurement_Backend.Persistence
             {
                 var query = db.Set<T>();
                 return predicate == null ? query.ToList() : query.Where(predicate).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Update in DB (if exists)
+        /// </summary>
+        /// <param name="item">object to update</param>
+        public void Update(T item)
+        {
+            using (var db = new TimeMeasurementDbContext())
+            {
+                db.Set<T>().Attach(item);
+                db.Entry(item).State = EntityState.Modified;
+                db.SaveChanges();
             }
         }
     }

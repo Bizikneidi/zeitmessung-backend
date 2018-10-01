@@ -1,18 +1,14 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
+using TimeMeasurement_Backend.Handlers.Messaging;
 
 namespace TimeMeasurement_Backend.Handlers
 {
     /// <summary>
     /// Handles websocket connections with multiple viewers
     /// </summary>
-    public class ViewerHandler : Handler<ViewerHandler.Commands>
+    public class ViewerHandler : Handler<ViewerCommands>
     {
-        public enum Commands
-        {
-            //TODO
-        }
-
         public static ViewerHandler Instance { get; } = new ViewerHandler();
 
         /// <summary>
@@ -20,13 +16,13 @@ namespace TimeMeasurement_Backend.Handlers
         /// </summary>
         /// <param name="viewer">The Websocket corrresponding to a viewer</param>
         /// <returns></returns>
-        public async Task AddViewer(WebSocket viewer)
+        public async Task AddViewerAsync(WebSocket viewer)
         {
             //Simply listen for messages
             await ListenAsync(viewer);
         }
 
-        protected override void HandleMessage(WebSocket sender, Message<Commands> received)
+        protected override void HandleMessage(WebSocket sender, Message<ViewerCommands> received)
         {
             //TODO
         }

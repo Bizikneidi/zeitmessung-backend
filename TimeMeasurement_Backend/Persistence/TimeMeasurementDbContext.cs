@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeMeasurement_Backend.Entities;
 
 namespace TimeMeasurement_Backend.Persistence
 {
@@ -7,12 +8,20 @@ namespace TimeMeasurement_Backend.Persistence
     /// </summary>
     public class TimeMeasurementDbContext : DbContext
     {
-        //TODO add DbSet<...>
+        /// <summary>
+        /// Mapping to table, storing every Time entity
+        /// </summary>
+        public DbSet<Time> Times { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Set SQL Server Path
-            optionsBuilder.UseSqlServer(""); //TODO set sql server
+            optionsBuilder.UseSqlServer(
+                "Data Source=(localdb)\\MSSQLLocalDB;" +
+                "Initial Catalog=TimeMeasurementDb;" +
+                "Integrated Security=True;" +
+                "Pooling=False"
+            );
         }
     }
 }
