@@ -16,9 +16,12 @@ namespace TimeMeasurement_Backend.Handlers
             EndTime //Message contains end time
         }
 
-        public static StationHandler Instance { get; } = new StationHandler();
-
+        /// <summary>
+        /// The weboscket corresponding to the station
+        /// </summary>
         private WebSocket _station;
+
+        public static StationHandler Instance { get; } = new StationHandler();
 
         /// <summary>
         /// Send a start signal to the station to tell it to start measuring the time
@@ -42,6 +45,12 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         public async Task SetStation(WebSocket ws)
         {
+            //Something has already connected as a station
+            if (_station != null)
+            {
+                return;
+            }
+
             _station = ws;
             await ListenAsync(_station);
         }
@@ -51,10 +60,10 @@ namespace TimeMeasurement_Backend.Handlers
             switch (received.Command)
             {
                 case Command.StartTime:
-                    //Station has sent start time
+                    //TODO Station has sent start time
                     break;
                 case Command.EndTime:
-                    //Station has sent end time
+                    //TODO Station has sent end time
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

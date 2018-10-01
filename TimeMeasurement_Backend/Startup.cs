@@ -8,18 +8,9 @@ namespace TimeMeasurement_Backend
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc();
-        }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -43,7 +34,8 @@ namespace TimeMeasurement_Backend
                     //get connected websocket
                     var ws = await context.WebSockets.AcceptWebSocketAsync();
                     //Pass ws to correct handler
-                    switch (requestPath) {
+                    switch (requestPath)
+                    {
                         case "admin":
                             await AdminHandler.Instance.SetAdmin(ws);
                             break;
@@ -51,6 +43,7 @@ namespace TimeMeasurement_Backend
                             await StationHandler.Instance.SetStation(ws);
                             break;
                         case "viewer":
+                            await ViewerHandler.Instance.AddViewer(ws);
                             break;
                     }
                 }
@@ -62,6 +55,12 @@ namespace TimeMeasurement_Backend
             });
 
             app.UseMvc();
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc();
         }
     }
 }

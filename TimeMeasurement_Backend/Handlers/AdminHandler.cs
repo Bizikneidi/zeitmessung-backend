@@ -14,6 +14,11 @@ namespace TimeMeasurement_Backend.Handlers
             Start //Station should start measuring time
         }
 
+        /// <summary>
+        /// The weboscket corresponding to the admin
+        /// </summary>
+        private WebSocket _admin;
+
         public static AdminHandler Instance { get; } = new AdminHandler();
 
         /// <summary>
@@ -23,8 +28,14 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         public async Task SetAdmin(WebSocket admin)
         {
-            //Simply listen for messages
-            await ListenAsync(admin);
+            //Someone has already connected as admin
+            if (_admin != null)
+            {
+                return;
+            }
+
+            _admin = admin;
+            await ListenAsync(_admin);
         }
 
         protected override void HandleMessage(WebSocket sender, Message<Command> received)

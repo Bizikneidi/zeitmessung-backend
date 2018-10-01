@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace TimeMeasurement_Backend.Handlers
 {
-    public class Message<T> where T : Enum
+    /// <summary>
+    /// Used to send Commands and Data between webosckets, (is therefor converted to JSON)
+    /// </summary>
+    /// <typeparam name="TCommands">The available commands</typeparam>
+    public class Message<TCommands> where TCommands : Enum
     {
         /// <summary>
-        /// Command used to identify purpose of Message 
+        /// Command used to identify purpose of Message
         /// </summary>
-        public T Command { get; set; }
+        public TCommands Command { get; set; }
 
         /// <summary>
         /// The "Arguments" which come with the command

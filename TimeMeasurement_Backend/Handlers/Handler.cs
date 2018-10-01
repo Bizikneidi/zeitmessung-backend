@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -9,8 +8,19 @@ using Newtonsoft.Json;
 
 namespace TimeMeasurement_Backend.Handlers
 {
-    public abstract class Handler<T> where T : Enum
+    /// <summary>
+    /// Handles connections with websockets over Messages
+    /// </summary>
+    /// <typeparam name="TCommands">The available Commands for the Messages</typeparam>
+    public abstract class Handler<TCommands> where TCommands : Enum
     {
+        /// <summary>
+        /// Used to process received messages
+        /// </summary>
+        /// <param name="sender">The sender of the message</param>
+        /// <param name="received">The message</param>
+        protected abstract void HandleMessage(WebSocket sender, Message<TCommands> received);
+
         /// <summary>
         /// Starts listening to Websocket and passes received Messages to HandleMessage
         /// </summary>
@@ -31,8 +41,9 @@ namespace TimeMeasurement_Backend.Handlers
                     await ws.CloseAsync(rs.CloseStatus.Value, rs.CloseStatusDescription, CancellationToken.None);
                     return;
                 }
+
                 //Convert reveived data to JSON string, then to Message
-                var received = JsonConvert.DeserializeObject<Message<T>>(Encoding.UTF8.GetString(receiveBuffer));
+                var received = JsonConvert.DeserializeObject<Message<TCommands>>(Encoding.UTF8.GetString(receiveBuffer));
                 HandleMessage(ws, received);
             }
         }
@@ -43,7 +54,7 @@ namespace TimeMeasurement_Backend.Handlers
         /// <param name="receiver">The target websocket</param>
         /// <param name="toSend">The message</param>
         /// <returns></returns>
-        protected async Task SendMessageAsync(WebSocket receiver, Message<T> toSend)
+        protected async Task SendMessageAsync(WebSocket receiver, Message<TCommands> toSend)
         {
             if (receiver == null)
             {
@@ -59,12 +70,5 @@ namespace TimeMeasurement_Backend.Handlers
                 CancellationToken.None
             );
         }
-
-        /// <summary>
-        /// Used to process received messages
-        /// </summary>
-        /// <param name="sender">The sender of the message</param>
-        /// <param name="received">The message</param>
-        protected abstract void HandleMessage(WebSocket sender, Message<T> received);
     }
 }
