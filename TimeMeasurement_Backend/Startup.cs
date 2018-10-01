@@ -1,30 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using TimeMeasurement_Backend.Handlers;
 
 namespace TimeMeasurement_Backend
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc();
-        }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -34,7 +20,47 @@ namespace TimeMeasurement_Backend
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseWebSockets();
+            //Register Custom Connection Handling
+            app.Use(async (context, next) =>
+            {
+                //Get request path
+                var path = context.Request.Path.Value.Split('/');
+                //Check if request is WS and path requestPath has value
+                if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
+                {
+                    //admin / station / viewer
+                    string requestPath = path[1].ToLower();
+                    //get connected websocket
+                    var ws = await context.WebSockets.AcceptWebSocketAsync();
+                    //Pass ws to correct handler
+                    switch (requestPath)
+                    {
+                        case "admin":
+                            await AdminHandler.Instance.SetAdmin(ws);
+                            break;
+                        case "station":
+                            await StationHandler.Instance.SetStation(ws);
+                            break;
+                        case "viewer":
+                            await ViewerHandler.Instance.AddViewer(ws);
+                            break;
+                    }
+                }
+                else
+                {
+                    //Pass to next handler (registered by ASP)
+                    await next.Invoke();
+                }
+            });
+
             app.UseMvc();
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc();
         }
     }
 }
