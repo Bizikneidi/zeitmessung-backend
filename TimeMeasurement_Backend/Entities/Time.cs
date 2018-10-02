@@ -19,10 +19,5 @@
         /// The start time of the run
         /// </summary>
         public long? Start { get; set; }
-
-        /// <summary>
-        /// The time between Start and End
-        /// </summary>
-        public long? Value => End - Start;
     }
 }

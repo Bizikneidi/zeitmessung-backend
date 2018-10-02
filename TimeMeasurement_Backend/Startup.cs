@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TimeMeasurement_Backend.Handlers;
+using TimeMeasurement_Backend.Networking;
 using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend
@@ -27,6 +27,11 @@ namespace TimeMeasurement_Backend
                 ctx.Database.EnsureCreated();
             }
 
+            //Create handlers for certain types of websocket connections
+            var adminHandler = new AdminHandler();
+            var stationHandler = new StationHandler();
+            var viewerHandler = new ViewerHandler();
+
             app.UseWebSockets();
             //Register Custom Connection Handling
             app.Use(async (context, next) =>
@@ -44,13 +49,13 @@ namespace TimeMeasurement_Backend
                     switch (requestPath)
                     {
                         case "admin":
-                            await AdminHandler.Instance.SetAdminAsync(ws);
+                            await adminHandler.SetAdminAsync(ws);
                             break;
                         case "station":
-                            await StationHandler.Instance.SetStationAsync(ws);
+                            await stationHandler.SetStationAsync(ws);
                             break;
                         case "viewer":
-                            await ViewerHandler.Instance.AddViewerAsync(ws);
+                            await viewerHandler.AddViewerAsync(ws);
                             break;
                     }
                 }
