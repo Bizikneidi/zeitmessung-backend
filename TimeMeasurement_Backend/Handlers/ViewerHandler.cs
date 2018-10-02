@@ -1,5 +1,11 @@
-﻿using System.Net.WebSockets;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using TimeMeasurement_Backend.Handlers.Messaging;
 
 namespace TimeMeasurement_Backend.Handlers
@@ -9,7 +15,14 @@ namespace TimeMeasurement_Backend.Handlers
     /// </summary>
     public class ViewerHandler : Handler<ViewerCommands>
     {
+        /// <summary>
+        /// All connected Viewers
+        /// </summary>
+        private readonly List<WebSocket> _viewers;
+
         public static ViewerHandler Instance { get; } = new ViewerHandler();
+
+        private ViewerHandler() => _viewers = new List<WebSocket>();
 
         /// <summary>
         /// Connect with viewer and listen for its messages
@@ -22,9 +35,65 @@ namespace TimeMeasurement_Backend.Handlers
             await ListenAsync(viewer);
         }
 
+        /// <summary>
+        /// Tells all viewers that a run has ended at the following time
+        /// </summary>
+        /// <param name="end">the time the run has ended</param>
+        public void BroadcastRunEnd(DateTime end)
+        {
+            var message = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.RunEnd,
+                Data = end
+            };
+            Broadcast(message);
+        }
+
+        /// <summary>
+        /// Tells all viewers that a run has startet at the following time
+        /// </summary>
+        /// <param name="start">the time the run has started</param>
+        public void BroadcastRunStart(DateTime start)
+        {
+            var message = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.RunStart,
+                Data = start
+            };
+            Broadcast(message);
+        }
+
         protected override void HandleMessage(WebSocket sender, Message<ViewerCommands> received)
         {
             //TODO
+        }
+
+        protected override void OnDisconnect(WebSocket disconnected)
+        {
+            //Remove from active viewers
+            _viewers.Remove(disconnected);
+        }
+
+        /// <summary>
+        /// Broadcasts a message to all connected viewers
+        /// </summary>
+        /// <param name="toBroadcast">the message to send out</param>
+        private void Broadcast(Message<ViewerCommands> toBroadcast)
+        {
+            //Convert Message to JSON, then to byte[]
+            var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(toBroadcast));
+            //Arraysegment with length of not 0 bytes
+            var segment = new ArraySegment<byte>(data, 0, data.Count(b => b != 0));
+            //Parallel due to await
+            Parallel.ForEach(_viewers, async receiver =>
+            {
+                await receiver.SendAsync(
+                    segment,
+                    WebSocketMessageType.Text,
+                    true, //Message is not split
+                    CancellationToken.None
+                );
+            });
         }
     }
 }

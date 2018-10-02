@@ -41,5 +41,10 @@ namespace TimeMeasurement_Backend.Handlers
                 StationHandler.Instance.SendStartSignal();
             }
         }
+
+        protected override void OnDisconnect(WebSocket disconnected)
+        {
+            _admin = null;
+        }
     }
 }

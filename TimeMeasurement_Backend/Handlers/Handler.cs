@@ -46,6 +46,7 @@ namespace TimeMeasurement_Backend.Handlers
                 {
                     //Close and exit
                     await ws.CloseAsync(rs.CloseStatus.Value, rs.CloseStatusDescription, CancellationToken.None);
+                    OnDisconnect(ws);
                     return;
                 }
 
@@ -54,6 +55,12 @@ namespace TimeMeasurement_Backend.Handlers
                 HandleMessage(ws, received);
             }
         }
+
+        /// <summary>
+        /// Gets called, whenever a websocket disconnects
+        /// </summary>
+        /// <param name="disconnected">The ws which lost connection</param>
+        protected abstract void OnDisconnect(WebSocket disconnected);
 
         /// <summary>
         /// Sends a message to a websocket client
