@@ -31,6 +31,7 @@ namespace TimeMeasurement_Backend.Handlers
         /// <returns></returns>
         public async Task AddViewerAsync(WebSocket viewer)
         {
+            _viewers.Add(viewer);
             //Simply listen for messages
             await ListenAsync(viewer);
         }
@@ -38,13 +39,12 @@ namespace TimeMeasurement_Backend.Handlers
         /// <summary>
         /// Tells all viewers that a run has ended at the following time
         /// </summary>
-        /// <param name="end">the time the run has ended</param>
-        public void BroadcastRunEnd(DateTime end)
+        public void BroadcastRunEnd()
         {
             var message = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.RunEnd,
-                Data = end
+                Data = null
             };
             Broadcast(message);
         }
@@ -52,13 +52,12 @@ namespace TimeMeasurement_Backend.Handlers
         /// <summary>
         /// Tells all viewers that a run has startet at the following time
         /// </summary>
-        /// <param name="start">the time the run has started</param>
-        public void BroadcastRunStart(DateTime start)
+        public void BroadcastRunStart()
         {
             var message = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.RunStart,
-                Data = start
+                Data = null
             };
             Broadcast(message);
         }
