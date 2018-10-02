@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TimeMeasurement_Backend.Handlers.Messaging
+namespace TimeMeasurement_Backend.Networking.Messaging
 {
     /// <summary>
     /// Used to send Commands and Data between websockets, (is therefor converted to JSON)
