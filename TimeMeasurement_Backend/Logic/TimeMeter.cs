@@ -22,12 +22,36 @@ namespace TimeMeasurement_Backend.Logic
         private State _currentState;
 
         /// <summary>
+        /// The internal time of the machine, at the time of StartMeasurement(starttime)
+        /// </summary>
+        private long _serverStartTime;
+
+        /// <summary>
+        /// Calculate the time of the station based on the difference between
+        /// station start time and machine start time
+        /// </summary>
+        public long ApproximatedCurrentTime
+        {
+            get
+            {
+                //Can not calculate, if no time is being measured
+                if (CurrentState != State.Measuring || Measurement.Start == null)
+                {
+                    return -1;
+                }
+
+                long diff = _serverStartTime - (long)Measurement.Start;
+                return DateTimeOffset.Now.ToUnixTimeMilliseconds() - diff;
+            }
+        }
+
+        /// <summary>
         /// The current state of the time meter
         /// </summary>
         public State CurrentState
         {
             get => _currentState;
-            set
+            private set
             {
                 var prev = _currentState;
                 _currentState = value;
@@ -53,11 +77,46 @@ namespace TimeMeasurement_Backend.Logic
         public event Action<State, State> StateChanged;
 
         /// <summary>
+        /// Allows others to set the time meter to disabled
+        /// </summary>
+        public void Disable()
+        {
+            Measurement = null;
+            CurrentState = State.Disabled;
+        }
+
+        /// <summary>
+        /// Allows others to set the time meter to ready
+        /// </summary>
+        public void Ready()
+        {
+            //Only possible, if time meter is disabled
+            if (CurrentState == State.Disabled)
+            {
+                CurrentState = State.Ready;
+            }
+        }
+
+        /// <summary>
+        /// Allows others to request a measurement
+        /// </summary>
+        public void RequestMeasurement()
+        {
+            //Only possible, if time meter is ready
+            if (CurrentState == State.Ready)
+            {
+                CurrentState = State.MeasurementRequested;
+            }
+        }
+
+        /// <summary>
         /// State a measurement
         /// </summary>
         /// <param name="startTime">the start time of the measurement</param>
         public void StartMeasurement(long startTime)
         {
+            //store current system time
+            _serverStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             Measurement = new Time
             {
                 Start = startTime,

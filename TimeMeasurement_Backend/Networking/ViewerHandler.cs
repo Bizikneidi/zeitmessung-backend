@@ -37,7 +37,7 @@ namespace TimeMeasurement_Backend.Networking
 
         protected override void HandleMessage(WebSocket sender, Message<ViewerCommands> received)
         {
-            //TODO
+            //No messages yet
         }
 
         protected override void OnDisconnect(WebSocket disconnected)
@@ -57,7 +57,12 @@ namespace TimeMeasurement_Backend.Networking
                     var message = new Message<ViewerCommands>
                     {
                         Command = ViewerCommands.MeasuredStart,
-                        Data = TimeMeter.Instance.Measurement
+                        Data = new MeasurementStart
+                        {
+                            // ReSharper disable once PossibleInvalidOperationException
+                            StartTime = (long)TimeMeter.Instance.Measurement.Start,
+                            CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime
+                        }
                     };
                     Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
                     break;
@@ -84,12 +89,49 @@ namespace TimeMeasurement_Backend.Networking
         /// <returns></returns>
         private async Task SendCurrentStateTo(WebSocket receiver)
         {
+            object data;
+            //If time is being measured
+            if (TimeMeter.Instance.CurrentState == TimeMeter.State.Measuring)
+            {
+                //Send start time and current station time to allow client to calculate time differences and run local timer
+                data = new MeasurementStart
+                {
+                    // ReSharper disable once PossibleInvalidOperationException
+                    StartTime = (long)TimeMeter.Instance.Measurement.Start,
+                    CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime
+                };
+            }
+            else
+            {
+                //Simply send state
+                data = TimeMeter.Instance.CurrentState;
+            }
+
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Status,
-                Data = TimeMeter.Instance.CurrentState
+                Data = data
             };
             await SendMessageAsync(receiver, toSend);
+        }
+
+        /// <summary>
+        /// entity to store the start and current time for state - and measurment start messages
+        /// Can be used by viewers to calculate time differences and run local timer
+        /// </summary>
+        private class MeasurementStart
+        {
+            /// <summary>
+            /// The current time of the station
+            /// </summary>
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local
+            public long CurrentTime { get; set; }
+
+            /// <summary>
+            /// The start time of the station
+            /// </summary>
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local
+            public long StartTime { get; set; }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace TimeMeasurement_Backend.Networking
             }
 
             _station = ws;
-            TimeMeter.Instance.CurrentState = TimeMeter.State.Ready; //The TimeMeter is now ready to start a measurement
+            TimeMeter.Instance.Ready(); //The TimeMeter is now ready to start a measurement
             await ListenAsync(_station);
         }
 
@@ -53,7 +53,7 @@ namespace TimeMeasurement_Backend.Networking
 
         protected override void OnDisconnect(WebSocket disconnected)
         {
-            TimeMeter.Instance.CurrentState = TimeMeter.State.Disabled; //The TimeMeter is no longer ready to start a measurement
+            TimeMeter.Instance.Disable(); //The TimeMeter is no longer ready to start a measurement
             _station = null;
         }
 

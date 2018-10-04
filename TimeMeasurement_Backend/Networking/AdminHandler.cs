@@ -43,11 +43,8 @@ namespace TimeMeasurement_Backend.Networking
             }
 
             //Admin has pressed start
-            //Tell station to start measuring time if it is ready
-            if (TimeMeter.Instance.CurrentState == TimeMeter.State.Ready)
-            {
-                TimeMeter.Instance.CurrentState = TimeMeter.State.MeasurementRequested;
-            }
+            //Tell time meter to start measuring
+            TimeMeter.Instance.RequestMeasurement();
         }
 
         protected override void OnDisconnect(WebSocket disconnected)
@@ -57,10 +54,8 @@ namespace TimeMeasurement_Backend.Networking
 
         private void OnTimeMeterStateChanged(TimeMeter.State prev, TimeMeter.State current)
         {
-            if (current != TimeMeter.State.MeasurementRequested) //Dont react to own request
-            {
-                Task.Run(async () => await SendCurrentState());
-            }
+            //Notify admin
+            Task.Run(async () => await SendCurrentState());
         }
 
         /// <summary>
