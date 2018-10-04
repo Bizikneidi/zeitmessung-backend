@@ -7,3 +7,7 @@ services:
       SA_PASSWORD: "My_Super-Secure-Password_For_Our_1st_TimeMeasurement"
       ACCEPT_EULA: "Y"
     
+  dot-net-runtime:
+    image: "microsoft/dotnet"
+
+  
