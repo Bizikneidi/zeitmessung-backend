@@ -74,7 +74,7 @@ namespace TimeMeasurement_Backend.Networking
                     var message = new Message<ViewerCommands>
                     {
                         Command = ViewerCommands.MeasuredEnd,
-                        Data = TimeMeter.Instance.Measurement
+                        Data = TimeMeter.Instance.Measurement.End
                     };
                     Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
                     break;
@@ -89,30 +89,29 @@ namespace TimeMeasurement_Backend.Networking
         /// <returns></returns>
         private async Task SendCurrentStateTo(WebSocket receiver)
         {
-            object data;
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Status,
+                Data = TimeMeter.Instance.CurrentState
+            };
+            await SendMessageAsync(receiver, toSend);
+            
             //If time is being measured
             if (TimeMeter.Instance.CurrentState == TimeMeter.State.Measuring)
             {
                 //Send start time and current station time to allow client to calculate time differences and run local timer
-                data = new MeasurementStart
+                var message = new Message<ViewerCommands>
                 {
-                    // ReSharper disable once PossibleInvalidOperationException
-                    StartTime = (long)TimeMeter.Instance.Measurement.Start,
-                    CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime
+                    Command = ViewerCommands.MeasuredStart,
+                    Data = new MeasurementStart
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        StartTime = (long)TimeMeter.Instance.Measurement.Start,
+                        CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime
+                    }
                 };
+                await SendMessageAsync(receiver, message);
             }
-            else
-            {
-                //Simply send state
-                data = TimeMeter.Instance.CurrentState;
-            }
-
-            var toSend = new Message<ViewerCommands>
-            {
-                Command = ViewerCommands.Status,
-                Data = data
-            };
-            await SendMessageAsync(receiver, toSend);
         }
 
         /// <summary>
