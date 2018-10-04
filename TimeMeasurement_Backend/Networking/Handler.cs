@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using TimeMeasurement_Backend.Handlers.Messaging;
+using TimeMeasurement_Backend.Networking.Messaging;
 
-namespace TimeMeasurement_Backend.Handlers
+namespace TimeMeasurement_Backend.Networking
 {
     /// <summary>
     /// Handles connections with websockets over Messages
@@ -15,6 +16,29 @@ namespace TimeMeasurement_Backend.Handlers
     /// <typeparam name="TCommands">The available Commands for the Messages</typeparam>
     public abstract class Handler<TCommands> where TCommands : Enum
     {
+        /// <summary>
+        /// Broadcasts a message to all receivers
+        /// </summary>
+        /// <param name="receivers">The target websockets</param>
+        /// <param name="toBroadcast">The message</param>
+        protected async Task BroadcastMessageAsync(IEnumerable<WebSocket> receivers, Message<TCommands> toBroadcast)
+        {
+            //Convert Message to JSON, then to byte[]
+            var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(toBroadcast));
+            //Arraysegment with length of not 0 bytes
+            var segment = new ArraySegment<byte>(data, 0, data.Count(b => b != 0));
+            //Parallel due to await
+            foreach (var receiver in receivers)
+            {
+                await receiver.SendAsync(
+                    segment,
+                    WebSocketMessageType.Text,
+                    true, //Message is not split
+                    CancellationToken.None
+                );
+            }
+        }
+
         /// <summary>
         /// Used to process received messages
         /// </summary>
@@ -46,6 +70,7 @@ namespace TimeMeasurement_Backend.Handlers
                 {
                     //Close and exit
                     await ws.CloseAsync(rs.CloseStatus.Value, rs.CloseStatusDescription, CancellationToken.None);
+                    OnDisconnect(ws);
                     return;
                 }
 
@@ -54,6 +79,12 @@ namespace TimeMeasurement_Backend.Handlers
                 HandleMessage(ws, received);
             }
         }
+
+        /// <summary>
+        /// Gets called, whenever a websocket disconnects
+        /// </summary>
+        /// <param name="disconnected">The ws which lost connection</param>
+        protected abstract void OnDisconnect(WebSocket disconnected);
 
         /// <summary>
         /// Sends a message to a websocket client

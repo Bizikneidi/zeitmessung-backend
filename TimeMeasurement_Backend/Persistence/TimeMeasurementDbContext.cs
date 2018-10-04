@@ -20,7 +20,7 @@ namespace TimeMeasurement_Backend.Persistence
                 "Data Source=(localdb)\\MSSQLLocalDB;" +
                 "Initial Catalog=TimeMeasurementDb;" +
                 "Integrated Security=True;" +
-                "Pooling=False"
+                "Pooling=True"
             );
         }
     }
