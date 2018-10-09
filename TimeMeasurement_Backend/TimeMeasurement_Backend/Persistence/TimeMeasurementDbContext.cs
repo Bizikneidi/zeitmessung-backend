@@ -16,12 +16,16 @@ namespace TimeMeasurement_Backend.Persistence
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Set SQL Server Path
-            optionsBuilder.UseSqlServer(
+            optionsBuilder.UseMySQL("server=localhost;" +
+                "port=3306;" +
+                "database=TimeMeasurementDb");
+
+            /*optionsBuilder.UseSqlServer(
                 "Data Source=(localdb)\\MSSQLLocalDB;" +
                 "Initial Catalog=TimeMeasurementDb;" +
                 "Integrated Security=True;" +
                 "Pooling=True"
-            );
+            );*/
         }
     }
 }
