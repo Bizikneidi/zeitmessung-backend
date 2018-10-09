@@ -31,6 +31,7 @@ namespace TimeMeasurement_Backend
             var adminHandler = new AdminHandler();
             var stationHandler = new StationHandler();
             var viewerHandler = new ViewerHandler();
+            var participantHandler = new ParticipantHandler();
 
             app.UseWebSockets();
             //Register Custom Connection Handling
@@ -41,7 +42,7 @@ namespace TimeMeasurement_Backend
                 //Check if request is WS and path requestPath has value
                 if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
                 {
-                    //admin / station / viewer
+                    //admin / station / viewer / participant
                     string requestPath = path[1].ToLower();
                     //get connected websocket
                     var ws = await context.WebSockets.AcceptWebSocketAsync();
@@ -56,6 +57,9 @@ namespace TimeMeasurement_Backend
                             break;
                         case "viewer":
                             await viewerHandler.AddViewerAsync(ws);
+                            break;
+                        case "participant":
+                            await participantHandler.AddPotentialParticipant(ws);
                             break;
                     }
                 }
