@@ -95,7 +95,7 @@ namespace TimeMeasurement_Backend.Networking
                 Data = TimeMeter.Instance.CurrentState
             };
             await SendMessageAsync(receiver, toSend);
-            
+
             //If time is being measured
             if (TimeMeter.Instance.CurrentState == TimeMeter.State.Measuring)
             {

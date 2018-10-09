@@ -9,14 +9,14 @@ namespace TimeMeasurement_Backend.Persistence
     public class TimeMeasurementDbContext : DbContext
     {
         /// <summary>
-        /// Mapping to table, storing every Time entity
-        /// </summary>
-        public DbSet<Time> Times { get; set; }
-
-        /// <summary>
         /// Mapping to table, storing every Participant entity
         /// </summary>
         public DbSet<Participant> Participants { get; set; }
+
+        /// <summary>
+        /// Mapping to table, storing every Time entity
+        /// </summary>
+        public DbSet<Time> Times { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
