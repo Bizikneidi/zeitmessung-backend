@@ -1,0 +1,15 @@
+docker images
+docker inspect <image>
+    -> Passwort ('SA_PASSWORD' unter 'env')
+
+IP-Addressen sind nicht statisch (man muss ein config-file anlegen), wurde bereits gemacht
+    -> docker-compose-deploy.yaml
+        -> SA_PASSWORD in environment anlegen (muss stark sein!)
+        -> networks
+            ipv4-Address
+                <ip-address>
+        
+
+MSSQL-Server-Linux
+    mindestens 2 CPU-Kerne und 4 GB RAM
+    Für Zugriff: npm i sql-cli
