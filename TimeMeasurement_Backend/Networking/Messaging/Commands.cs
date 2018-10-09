@@ -19,4 +19,9 @@
         MeasuredStart = 1, //Broadcast where message contains the start time
         MeasuredEnd = 2 //Broadcast where message contains the stop time
     }
+
+    public enum ParticipantCommands
+    {
+        Register = 0 //Message contains data to register as a participant
+    }
 }
