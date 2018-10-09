@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace TimeMeasurement_Backend.Entities
@@ -71,5 +72,26 @@ namespace TimeMeasurement_Backend.Entities
 
         [RegularExpression("^(?:(?:\\(?(?:00|\\+)([1-4]\\d\\d|[1-9]\\d?)\\)?)?[\\-\\.\\ \\\\\\/]?)?((?:\\(?\\d{1,}\\)?[\\-\\.\\ \\\\\\/]?){0,})(?:[\\-\\.\\ \\\\\\/]?(?:#|ext\\.?|extension|x)[\\-\\.\\ \\\\\\/]?(\\d+))?$")]
         public string PhoneNumber { get; set; }
+
+        class BooleanRequired : ValidationAttribute
+        {
+            protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+            {
+                if(value != null)
+                {
+                    try
+                    {
+                        var tmp = new MailAddress((string)value);
+                        return ValidationResult.Success;
+                    }
+                    catch (Exception ex)
+                    {
+                        return new ValidationResult(ex.Message);
+                    }
+                }
+
+                return new ValidationResult("Input was null");
+            }
+        }
     }
 }
