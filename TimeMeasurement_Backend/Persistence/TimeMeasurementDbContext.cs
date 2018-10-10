@@ -23,7 +23,10 @@ namespace TimeMeasurement_Backend.Persistence
             //Set SQL Server Path
             optionsBuilder.UseMySQL("server=localhost;" +
                 "port=3306;" +
-                "database=TimeMeasurementDb;SslMode=none");
+                "database=TimeMeasurementDb;" +
+                "user=default@localhost;" +
+                "password=User-1234;" +
+                "SslMode=none");
 
             //optionsBuilder.UseSqlServer(
             //    "Data Source=(localdb)\\MSSQLLocalDB;" +
