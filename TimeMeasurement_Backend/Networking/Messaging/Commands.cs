@@ -17,7 +17,7 @@
     {
         Status = 0, //Message contains the current time measurement status
         MeasuredStart = 1, //Broadcast where message contains the start time
-        MeasuredEnd = 2 //Broadcast where message contains the stop time
+        MeasuredStop = 2 //Broadcast where message contains the stop time
     }
 
     public enum ParticipantCommands
