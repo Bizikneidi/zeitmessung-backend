@@ -24,7 +24,7 @@ namespace TimeMeasurement_Backend.Persistence
             optionsBuilder.UseMySQL("server=localhost;" +
                 "port=3306;" +
                 "database=TimeMeasurementDb;" +
-                "user=default@localhost;" +
+                "user=default;" +
                 "password=User-1234;" +
                 "SslMode=none");
 
