@@ -73,7 +73,7 @@ namespace TimeMeasurement_Backend.Networking
                     //Notfiy all viewers
                     var message = new Message<ViewerCommands>
                     {
-                        Command = ViewerCommands.MeasuredEnd,
+                        Command = ViewerCommands.MeasuredStop,
                         Data = TimeMeter.Instance.Measurement.End
                     };
                     Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
