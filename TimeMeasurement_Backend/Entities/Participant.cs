@@ -86,7 +86,7 @@ namespace TimeMeasurement_Backend.Entities
         /// </summary>
         [Required]
         [RegularExpression(@"^[mws]$")]
-        public char Sex { get; set; }
+        public string Sex { get; set; }
 
         [Required]
         [RegularExpression(@"^([A - Za - z./ -])*$")]
