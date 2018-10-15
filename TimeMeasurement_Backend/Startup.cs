@@ -37,36 +37,39 @@ namespace TimeMeasurement_Backend
             //Register Custom Connection Handling
             app.Use(async (context, next) =>
             {
-                //Get request path
-                var path = context.Request.Path.Value.Split('/');
-                //Check if request is WS and path requestPath has value
-                if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
+                if (context.Request.IsHttps)
                 {
-                    //admin / station / viewer / participant
-                    string requestPath = path[1].ToLower();
-                    //get connected websocket
-                    var ws = await context.WebSockets.AcceptWebSocketAsync();
-                    //Pass ws to correct handler
-                    switch (requestPath)
+                    //Get request path
+                    var path = context.Request.Path.Value.Split('/');
+                    //Check if request is WS and path requestPath has value
+                    if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
                     {
-                        case "admin":
-                            await adminHandler.SetAdminAsync(ws);
-                            break;
-                        case "station":
-                            await stationHandler.SetStationAsync(ws);
-                            break;
-                        case "viewer":
-                            await viewerHandler.AddViewerAsync(ws);
-                            break;
-                        case "participant":
-                            await participantHandler.AddPotentialParticipant(ws);
-                            break;
+                        //admin / station / viewer / participant
+                        string requestPath = path[1].ToLower();
+                        //get connected websocket
+                        var ws = await context.WebSockets.AcceptWebSocketAsync();
+                        //Pass ws to correct handler
+                        switch (requestPath)
+                        {
+                            case "admin":
+                                await adminHandler.SetAdminAsync(ws);
+                                break;
+                            case "station":
+                                await stationHandler.SetStationAsync(ws);
+                                break;
+                            case "viewer":
+                                await viewerHandler.AddViewerAsync(ws);
+                                break;
+                            case "participant":
+                                await participantHandler.AddPotentialParticipant(ws);
+                                break;
+                        }
                     }
-                }
-                else
-                {
-                    //Pass to next handler (registered by ASP)
-                    await next.Invoke();
+                    else
+                    {
+                        //Pass to next handler (registered by ASP)
+                        await next.Invoke();
+                    }
                 }
             });
 
