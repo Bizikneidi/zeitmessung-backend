@@ -25,8 +25,7 @@ namespace TimeMeasurement_Backend.Persistence
                 "port=3306;" +
                 "database=TimeMeasurementDb;" +
                 "user=default;" +
-                "password=User-1234;" +
-                "SslMode=none");
+                "password=User-1234;");
 
             //optionsBuilder.UseSqlServer(
             //    "Data Source=(localdb)\\MSSQLLocalDB;" +
