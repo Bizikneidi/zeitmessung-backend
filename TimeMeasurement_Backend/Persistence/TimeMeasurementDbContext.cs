@@ -21,7 +21,7 @@ namespace TimeMeasurement_Backend.Persistence
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Set SQL Server Path
-            optionsBuilder.UseSqlite("Data Source=/data/time_measurement.db");
+            optionsBuilder.UseSqlite("Data Source=./time_measurement.db");
 
             //optionsBuilder.UseSqlServer(
             //    "Data Source=(localdb)\\MSSQLLocalDB;" +
