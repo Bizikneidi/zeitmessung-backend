@@ -16,7 +16,7 @@ namespace TimeMeasurement_Backend.Entities
         /// slashes
         /// </summary>
         [Required]
-        [RegularExpression(@"^([A-Za-z ./-])*$")]
+        [RegularExpression(@"^([A-ZÄÜÖ][a-zäüö]+)([- \.\/][A-ZÄÜÖ][a-zäüö]+)*$")]
         public string City { get; set; }
 
         [Required]
@@ -35,7 +35,7 @@ namespace TimeMeasurement_Backend.Entities
         public string Firstname { get; set; }
 
         [Required]
-        [RegularExpression(@"^([0-9a-zA-Z/])*$")]
+        [RegularExpression(@"^([A-ZÄÜÖa-zäüö0-9\/])+$")]
         public string HouseNumber { get; set; }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace TimeMeasurement_Backend.Entities
         [IsCountry]
         public string Nationality { get; set; }
 
-        [RegularExpression("^(?:(?:\\(?(?:00|\\+)([1-4]\\d\\d|[1-9]\\d?)\\)?)?[\\-\\.\\ \\\\\\/]?)?((?:\\(?\\d{1,}\\)?[\\-\\.\\ \\\\\\/]?){0,})(?:[\\-\\.\\ \\\\\\/]?(?:#|ext\\.?|extension|x)[\\-\\.\\ \\\\\\/]?(\\d+))?$")]
+        [RegularExpression(@"^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[- \./0-9]*$")]
         public string PhoneNumber { get; set; }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace TimeMeasurement_Backend.Entities
         /// slashes
         /// </summary>
         [Required]
-        [RegularExpression(@"^[A-Z][a-z0-9-:/]*$")]
+        [RegularExpression(@"^([A-ZÄÜÖa-zäüö0-9-:\/]+)$")]
         public string PostalCode { get; set; }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace TimeMeasurement_Backend.Entities
         public string Sex { get; set; }
 
         [Required]
-        [RegularExpression(@"^([A - Za - z./ -])*$")]
+        [RegularExpression(@"^([A-ZÄÜÖ][a-zäüö]+)([- \.\/][A-ZÄÜÖ][a-zäüö]+)*$")]
         public string Street { get; set; }
 
         public string Team { get; set; }
