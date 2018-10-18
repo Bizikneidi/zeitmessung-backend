@@ -32,7 +32,6 @@ namespace TimeMeasurement_Backend.Networking
 
             _station = ws;
             TimeMeter.Instance.Ready(); //The TimeMeter is now ready to start a measurement
-            TimeMeter.Instance.RequestMeasurement();
             await ListenAsync(_station);
         }
 
