@@ -11,7 +11,7 @@ namespace TimeMeasurement_Backend
         {
             IConfigurationRoot config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("hosting.json", optional: true)
+                .AddJsonFile("hosting.json", optional: false)
                 .Build();
 
             return WebHost.CreateDefaultBuilder(args)
