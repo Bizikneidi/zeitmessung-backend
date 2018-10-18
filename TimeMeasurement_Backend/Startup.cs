@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TimeMeasurement_Backend.Networking;
@@ -31,6 +32,7 @@ namespace TimeMeasurement_Backend
             var adminHandler = new AdminHandler();
             var stationHandler = new StationHandler();
             var viewerHandler = new ViewerHandler();
+
             var participantHandler = new ParticipantHandler();
 
             app.UseHttpsRedirection();
@@ -80,6 +82,11 @@ namespace TimeMeasurement_Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                options.HttpsPort = 5001;
+            });
         }
     }
 }
