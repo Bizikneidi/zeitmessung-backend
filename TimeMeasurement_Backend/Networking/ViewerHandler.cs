@@ -48,6 +48,15 @@ namespace TimeMeasurement_Backend.Networking
 
         private void OnTimeMeterStateChanged(TimeMeter.State prev, TimeMeter.State current)
         {
+            //Broadcast current state
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Status,
+                Data = TimeMeter.Instance.CurrentState
+            };
+            Task.Run(async () => await BroadcastMessageAsync(_viewers, toSend));
+
+            //Broadcast additional data on certain states
             switch (current)
             {
                 case TimeMeter.State.Measuring:
