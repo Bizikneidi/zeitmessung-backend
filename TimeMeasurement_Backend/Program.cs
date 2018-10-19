@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System.Net;
 
 namespace TimeMeasurement_Backend
 {
@@ -11,11 +12,18 @@ namespace TimeMeasurement_Backend
         {
             IConfigurationRoot config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("hosting.json", optional: true)
+                //.AddJsonFile("hosting.json", optional: true)
                 .Build();
 
             return WebHost.CreateDefaultBuilder(args)
-                .UseKestrel()
+                .UseKestrel(options =>
+                {
+                    options.Listen(IPAddress.Parse("172.18.2.16"), 5000);
+                    options.Listen(IPAddress.Parse("172.18.2.16"), 5001, listenOptions =>
+                    {
+                        listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
+                    });
+                })
                 .UseStartup<Startup>()
                 .UseConfiguration(config)
                 .Build();
