@@ -18,8 +18,8 @@ namespace TimeMeasurement_Backend
             return WebHost.CreateDefaultBuilder(args)
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Loopback, 5000);
-                    options.Listen(IPAddress.Loopback, 5001, listenOptions =>
+                    options.Listen(IPAddress.Parse("172.18.2.16"), 5000);
+                    options.Listen(IPAddress.Parse("172.18.2.16"), 5001, listenOptions =>
                     {
                         listenOptions.UseHttps("/root/certs/certificate.pem", "Admin1234");
                     });
