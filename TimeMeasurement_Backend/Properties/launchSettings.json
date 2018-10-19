@@ -22,8 +22,7 @@
       "launchUrl": "api/values",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://172.18.2.16:53933/"
+      }
     }
   }
 }
