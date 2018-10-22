@@ -1,6 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Networking.Messaging;
 using TimeMeasurement_Backend.Persistence;
@@ -31,13 +31,13 @@ namespace TimeMeasurement_Backend.Networking
 
         protected override void HandleMessage(WebSocket sender, Message<ParticipantCommands> received)
         {
-            if (received.Command == ParticipantCommands.Register)
+            if (received.Command != ParticipantCommands.Register)
             {
                 return;
             }
 
             //Deserialize received Participant and store in DB
-            var participant = JsonConvert.DeserializeObject<Participant>((string)received.Data);
+            var participant = ((JObject)received.Data).ToObject<Participant>();
             _repo.Create(participant);
         }
 
