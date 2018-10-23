@@ -5,6 +5,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Connections;
 using Newtonsoft.Json;
 using TimeMeasurement_Backend.Networking.Messaging;
 
@@ -72,25 +73,33 @@ namespace TimeMeasurement_Backend.Networking
                 return;
             }
 
-            while (true)
+            try
             {
-                //wait for input and read data into buffer
-                var receiveBuffer = new byte[4096];
-                var rs = await ws.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-
-                //Connection is being closed
-                if (rs.CloseStatus.HasValue)
+                while (true)
                 {
-                    //Close and exit
-                    await ws.CloseAsync(rs.CloseStatus.Value, rs.CloseStatusDescription, CancellationToken.None);
-                    OnDisconnect(ws);
-                    return;
-                }
+                    //wait for input and read data into buffer
+                    var receiveBuffer = new byte[4096];
+                    var rs = await ws.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
 
-                //Convert reveived data to JSON string, then to Message
-                var received = JsonConvert.DeserializeObject<Message<TCommands>>(Encoding.UTF8.GetString(receiveBuffer));
-                HandleMessage(ws, received);
+                    //Connection is being closed
+                    if (rs.CloseStatus.HasValue)
+                    {
+                        //Close and exit
+                        await ws.CloseAsync(rs.CloseStatus.Value, rs.CloseStatusDescription, CancellationToken.None);
+                        OnDisconnect(ws);
+                        return;
+                    }
+
+                    //Convert reveived data to JSON string, then to Message
+                    var received = JsonConvert.DeserializeObject<Message<TCommands>>(Encoding.UTF8.GetString(receiveBuffer));
+                    HandleMessage(ws, received);
+                }
             }
+            catch (Exception) //Client has force closed the connection
+            {
+                OnDisconnect(ws);
+            }
+
         }
 
         /// <summary>
