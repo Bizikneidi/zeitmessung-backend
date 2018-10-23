@@ -1,4 +1,5 @@
-﻿using System.Net.WebSockets;
+﻿using System.IO;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
@@ -72,7 +73,7 @@ namespace TimeMeasurement_Backend.Networking
                 Data = null
             };
             Task.Run(async () => await SendMessageAsync(_station, toSend));
-            throw new System.ArgumentException("REQUEST SENT TO STATION:!");
+            File.AppendAllLines("log.txt", new []{"SENT"});
         }
     }
 }
