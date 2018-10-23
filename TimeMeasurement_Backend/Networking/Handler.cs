@@ -5,7 +5,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Connections;
 using Newtonsoft.Json;
 using TimeMeasurement_Backend.Networking.Messaging;
 
@@ -34,13 +33,6 @@ namespace TimeMeasurement_Backend.Networking
                 //Receiver must not be null
                 if (receiver == null)
                 {
-                    continue;
-                }
-
-                //receiver has force closed
-                if (receiver.State != WebSocketState.Open)
-                {
-                    OnDisconnect(receiver);
                     continue;
                 }
 
@@ -119,13 +111,6 @@ namespace TimeMeasurement_Backend.Networking
             //receiver must not be null
             if (receiver == null)
             {
-                return;
-            }
-
-            //receiver has force closed
-            if (receiver.State != WebSocketState.Open)
-            {
-                OnDisconnect(receiver);
                 return;
             }
 
