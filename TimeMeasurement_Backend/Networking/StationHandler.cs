@@ -51,8 +51,6 @@ namespace TimeMeasurement_Backend.Networking
             }
         }
 
-        
-
         protected override void OnDisconnect(WebSocket disconnected)
         {
             TimeMeter.Instance.Disable(); //The TimeMeter is no longer ready to start a measurement

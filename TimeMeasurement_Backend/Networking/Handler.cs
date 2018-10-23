@@ -30,6 +30,19 @@ namespace TimeMeasurement_Backend.Networking
             //Parallel due to await
             foreach (var receiver in receivers)
             {
+                //Receiver must not be null
+                if (receiver == null)
+                {
+                    continue;
+                }
+
+                //receiver has force closed
+                if (receiver.State != WebSocketState.Open)
+                {
+                    OnDisconnect(receiver);
+                    continue;
+                }
+
                 await receiver.SendAsync(
                     segment,
                     WebSocketMessageType.Text,
@@ -97,6 +110,13 @@ namespace TimeMeasurement_Backend.Networking
             //receiver must not be null
             if (receiver == null)
             {
+                return;
+            }
+
+            //receiver has force closed
+            if (receiver.State != WebSocketState.Open)
+            {
+                OnDisconnect(receiver);
                 return;
             }
 
