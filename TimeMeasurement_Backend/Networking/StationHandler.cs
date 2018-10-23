@@ -72,6 +72,7 @@ namespace TimeMeasurement_Backend.Networking
                 Data = null
             };
             Task.Run(async () => await SendMessageAsync(_station, toSend));
+            throw new System.ArgumentException("REQUEST SENT TO STATION:!");
         }
     }
 }
