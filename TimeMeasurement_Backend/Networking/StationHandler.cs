@@ -1,4 +1,5 @@
-﻿using System.Net.WebSockets;
+﻿using System.IO;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
@@ -51,8 +52,6 @@ namespace TimeMeasurement_Backend.Networking
             }
         }
 
-        
-
         protected override void OnDisconnect(WebSocket disconnected)
         {
             TimeMeter.Instance.Disable(); //The TimeMeter is no longer ready to start a measurement
@@ -74,6 +73,7 @@ namespace TimeMeasurement_Backend.Networking
                 Data = null
             };
             Task.Run(async () => await SendMessageAsync(_station, toSend));
+            File.AppendAllLines("log.txt", new []{"SENT"});
         }
     }
 }
