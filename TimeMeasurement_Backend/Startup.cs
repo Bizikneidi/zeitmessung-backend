@@ -35,7 +35,7 @@ namespace TimeMeasurement_Backend
 
             var participantHandler = new ParticipantHandler();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseHsts();
             app.UseWebSockets();
             //Register Custom Connection Handling
