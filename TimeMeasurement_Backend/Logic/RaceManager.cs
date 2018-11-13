@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using TimeMeasurement_Backend.Entities;
 
 namespace TimeMeasurement_Backend.Logic
 {
@@ -21,6 +23,9 @@ namespace TimeMeasurement_Backend.Logic
         /// Event to allow others to act accoring to the current state of the time meter
         /// </summary>
         public event Action<State, State> StateChanged;
+
+        private TimeMeter _timeMeter;
+        private List<Time> _measurements;
         
         /// <summary>
         /// The current state of the time meter
@@ -35,8 +40,13 @@ namespace TimeMeasurement_Backend.Logic
                 StateChanged?.Invoke(prev, _currentState); //Notify subscribers to act
             }
         }
-        
-        private RaceManager() => _currentState = State.Disabled;
+
+        private RaceManager()
+        {
+            _currentState = State.Disabled;
+            _timeMeter = new TimeMeter();
+            _timeMeter.OnMeasurement += measurement => { _measurements.Add(measurement); };
+        }
         
         /// <summary>
         /// Allows others to set the time meter to disabled
@@ -72,12 +82,13 @@ namespace TimeMeasurement_Backend.Logic
         /// <summary>
         /// Allows others to set the time meter to InProgress
         /// </summary>
-        public void Start(long startTime)
+        public void Start()
         {
             if (CurrentState == State.StartRequested)
             {
                 //Pass to TimeMeter
                 CurrentState = State.InProgress;
+                
             }
         }
         
