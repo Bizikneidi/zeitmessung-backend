@@ -36,7 +36,7 @@ namespace TimeMeasurement_Backend
             var participantHandler = new ParticipantHandler();
 
             app.UseHttpsRedirection();
-            //app.UseHsts();
+            app.UseHsts();
             app.UseWebSockets();
             //Register Custom Connection Handling
             app.Use(async (context, next) =>
@@ -44,7 +44,6 @@ namespace TimeMeasurement_Backend
 
                 //Get request path
                 var path = context.Request.Path.Value.Split('/');
-                System.Diagnostics.Debug.WriteLine("Length of request-path: " + path.Length);
                 //Check if request is WS and path requestPath has value
                 if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
                 {
@@ -87,7 +86,6 @@ namespace TimeMeasurement_Backend
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 5001;
             });
         }
     }
