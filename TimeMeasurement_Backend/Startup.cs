@@ -47,6 +47,7 @@ namespace TimeMeasurement_Backend
                 //Check if request is WS and path requestPath has value
                 if (context.WebSockets.IsWebSocketRequest && path.Length == 2)
                 {
+                    
                     //admin / station / viewer / participant
                     string requestPath = path[1].ToLower();
                     //get connected websocket
@@ -85,7 +86,6 @@ namespace TimeMeasurement_Backend
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 5001;
             });
         }
     }
