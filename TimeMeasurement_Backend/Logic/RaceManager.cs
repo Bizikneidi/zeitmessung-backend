@@ -33,6 +33,7 @@ namespace TimeMeasurement_Backend.Logic
         private TimeMeasurementRepository<Participant> _participantRepo;
         private IEnumerable<Runner> _runners;
         private TimeMeasurementRepository<Runner> _runnerRepo;
+        private Race _currentRace;
         
         /// <summary>
         /// The current state of the time meter
@@ -99,6 +100,8 @@ namespace TimeMeasurement_Backend.Logic
                 //Pass to TimeMeter
                 CurrentState = State.InProgress;
                 RegisterRunners();
+                _currentRace = new Race() { Date = DateTimeOffset.Now.ToUnixTimeMilliseconds()};
+                new TimeMeasurementRepository<Race>().Create(_currentRace);
             }
         }
 
@@ -107,7 +110,7 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         private void RegisterRunners()
         {
-            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner {Starter = i, Participant = p}))
+            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner {Starter = i, Participant = p, Race = _currentRace}))
             {
                 _runnerRepo.Create(runner);
             }
