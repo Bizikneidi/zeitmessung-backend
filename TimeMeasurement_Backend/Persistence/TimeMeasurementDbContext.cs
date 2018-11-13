@@ -22,7 +22,7 @@ namespace TimeMeasurement_Backend.Persistence
         /// <summary>
         /// Mapping to table, storing every Participant with its Time entity
         /// </summary>
-        public DbSet<ParticipantTime> Timetable { get; set; }
+        public DbSet<Runner> Timetable { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

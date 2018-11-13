@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TimeMeasurement_Backend.Entities;
+using TimeMeasurement_Backend.Entities.Constraints;
+using TimeMeasurement_Backend.Entities.Entities;
+using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend.Logic
 {
@@ -26,6 +30,9 @@ namespace TimeMeasurement_Backend.Logic
 
         private TimeMeter _timeMeter;
         private List<Time> _measurements;
+        private TimeMeasurementRepository<Participant> _participantRepo;
+        private IEnumerable<Runner> _runners;
+        private TimeMeasurementRepository<Runner> _runnerRepo;
         
         /// <summary>
         /// The current state of the time meter
@@ -46,6 +53,9 @@ namespace TimeMeasurement_Backend.Logic
             _currentState = State.Disabled;
             _timeMeter = new TimeMeter();
             _timeMeter.OnMeasurement += measurement => { _measurements.Add(measurement); };
+
+            _participantRepo = new TimeMeasurementRepository<Participant>();
+            _runnerRepo = new TimeMeasurementRepository<Runner>();
         }
         
         /// <summary>
@@ -88,10 +98,16 @@ namespace TimeMeasurement_Backend.Logic
             {
                 //Pass to TimeMeter
                 CurrentState = State.InProgress;
-                
+                RegisterRunners();
             }
         }
-        
-        
+
+        public void RegisterRunners()
+        {
+            foreach (var runner in _participantRepo.Get().Select((p, i) => new Runner() {Starter = i, Participant = p}))
+            {
+                _runnerRepo.Create(runner);
+            }
+        }
     }
 }
