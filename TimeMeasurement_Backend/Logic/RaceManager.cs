@@ -102,12 +102,22 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
-        public void RegisterRunners()
+        private void RegisterRunners()
         {
-            foreach (var runner in _participantRepo.Get().Select((p, i) => new Runner() {Starter = i, Participant = p}))
+            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner {Starter = i, Participant = p}))
             {
                 _runnerRepo.Create(runner);
             }
+        }
+
+        private IEnumerable<Participant> GetNewParticipants()
+        {
+            return _participantRepo.Get(p => !_runnerRepo.Get(r => r.Participant == p).Any());
+        }
+
+        private void AssigneTimeToRunner(int starter, long time)
+        {
+            
         }
     }
 }
