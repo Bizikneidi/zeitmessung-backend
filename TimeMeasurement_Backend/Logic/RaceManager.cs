@@ -102,6 +102,9 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
+        /// <summary>
+        /// Mapping all participants to runners (new object with a time entity)
+        /// </summary>
         private void RegisterRunners()
         {
             foreach (var runner in GetNewParticipants().Select((p, i) => new Runner {Starter = i, Participant = p}))
@@ -110,14 +113,23 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
+        /// <summary>
+        /// Querying through all participants, getting all where no runner exists
+        /// </summary>
+        /// <returns>new participants</returns>
         private IEnumerable<Participant> GetNewParticipants()
         {
             return _participantRepo.Get(p => !_runnerRepo.Get(r => r.Participant == p).Any());
         }
 
+        /// <summary>
+        /// Assigns time to a runner
+        /// </summary>
+        /// <param name="starter"></param>
+        /// <param name="time"></param>
         private void AssignTimeToRunner(int starter, Time time)
         {
-            var runner = _runnerRepo.Get(p => p.Starter == starter).FirstOrDefault();
+            var runner = _runnerRepo.Get(p => p.Starter == starter).First();
             runner.Time = time;
             _runnerRepo.Update(runner);
         }

@@ -7,6 +7,5 @@ namespace TimeMeasurement_Backend.Entities
     {
         public int Id { get; set; }
         public long Date { get; set; }
-        public ICollection<Runner> Timetable { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Entities.Constraints;
+using TimeMeasurement_Backend.Entities.Entities;
 
 namespace TimeMeasurement_Backend.Persistence
 {
@@ -15,12 +16,12 @@ namespace TimeMeasurement_Backend.Persistence
         public DbSet<Participant> Participants { get; set; }
 
         /// <summary>
-        /// Mapping to table, storing every Time entity
+        /// Mapping to table, storing every Race entity
         /// </summary>
-        public DbSet<Time> Times { get; set; }
+        public DbSet<Race> Races { get; set; }
         
         /// <summary>
-        /// Mapping to table, storing every Participant with its Time entity
+        /// Mapping to table, storing every Runner entity
         /// </summary>
         public DbSet<Runner> Timetable { get; set; }
 
