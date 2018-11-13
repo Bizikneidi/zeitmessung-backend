@@ -115,9 +115,11 @@ namespace TimeMeasurement_Backend.Logic
             return _participantRepo.Get(p => !_runnerRepo.Get(r => r.Participant == p).Any());
         }
 
-        private void AssigneTimeToRunner(int starter, long time)
+        private void AssignTimeToRunner(int starter, Time time)
         {
-            
+            var runner = _runnerRepo.Get(p => p.Starter == starter).FirstOrDefault();
+            runner.Time = time;
+            _runnerRepo.Update(runner);
         }
     }
 }
