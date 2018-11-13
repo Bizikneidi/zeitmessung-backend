@@ -14,7 +14,7 @@ Server->Admin: {\n    Command: Status,\n    Data: Ready\n}
 Viewer1->Server: Connect
 Server->Viewer1: {\n    Command: Status,\n    Data: Ready\n}
 Admin->Server: {\n    Command: Start,\n    Data: null\n}
-Server->Station: {\n    Command: StartMeasuring,\n    Data: null\n}
+Server->Station: {\n    Command: StartMeasuring,\n    Data: 5\n}
 Station->Server: {\n    Command: MeasuredStart,\n    Data: 735\n}
 Server->Admin: {\n    Command: Status,\n    Data: Measuring\n}
 Server->Viewer1: {\n    Command: MeasuredStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742 \n    }\n}
