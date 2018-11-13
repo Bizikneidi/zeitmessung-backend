@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeMeasurement_Backend.Entities;
+using TimeMeasurement_Backend.Entities.Constraints;
 
 namespace TimeMeasurement_Backend.Persistence
 {
@@ -17,6 +18,11 @@ namespace TimeMeasurement_Backend.Persistence
         /// Mapping to table, storing every Time entity
         /// </summary>
         public DbSet<Time> Times { get; set; }
+        
+        /// <summary>
+        /// Mapping to table, storing every Participant with its Time entity
+        /// </summary>
+        public DbSet<ParticipantTime> Timetable { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
