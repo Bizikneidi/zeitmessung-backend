@@ -7,6 +7,7 @@ namespace TimeMeasurement_Backend.Networking.Messaging
     /// entity to store the basic information of the current race
     /// Can be used by viewers and admin to calculate time differences and run local timer
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public class RunStartDTO
     {
         /// <summary>
@@ -28,6 +29,7 @@ namespace TimeMeasurement_Backend.Networking.Messaging
     /// <summary>
     /// entity to map time with starter number
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public class AssignmentDTO
     {
         /// <summary>

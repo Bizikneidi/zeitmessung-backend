@@ -14,14 +14,22 @@ Server->Admin: {\n    Command: Status,\n    Data: Ready\n}
 Viewer1->Server: Connect
 Server->Viewer1: {\n    Command: Status,\n    Data: Ready\n}
 Admin->Server: {\n    Command: Start,\n    Data: null\n}
-Server->Station: {\n    Command: StartMeasuring,\n    Data: 5\n}
+Server->Station:{\n    Command: StartMeasuring,\n    Data: 5\n}
 Station->Server: {\n    Command: MeasuredStart,\n    Data: 735\n}
-Server->Admin: {\n    Command: Status,\n    Data: Measuring\n}
-Server->Viewer1: {\n    Command: MeasuredStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742 \n    }\n}
+Server->Admin: {\n    Command: Status,\n    Data: InProgress\n}
+Server->Admin: {\n    Command: RunStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742\n        Runners: ... \n    }\n}
+Server->Viewer1: {\n    Command: Status,\n    Data: InProgress\n}
+Server->Viewer1: {\n    Command: RunStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742\n        Runners: ... \n    }\n}
 Viewer2->Server: Connect
-Server->Viewer2: {\n    Command: Status,\n    Data: Measuring\n}
-Server->Viewer2: {\n    Command: MeasuredStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 854 \n    }\n}
-Station->Server: {\n    Command: MeasuredEnd,\n    Data: 897\n}
+Server->Viewer2: {\n    Command: Status,\n    Data: InProgress\n}
+Server->Viewer2: {\n    Command: RunStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742\n        Runners: ... \n    }\n}
+note over Server: Measurements Start
+Station->Server: {\n    Command: MeasuredStop,\n    Data: 897\n}
+Server->Admin: {\n    Command: MeasuredStop,\n    Data: 897\n}
+Admin->Server: {\n    Command: AssignTime,\n    Data:\n    {\n        Starter:3\n        Time: 897\n    }\n}
+Server->Viewer1: {\n    Command: RunnerFinished,\n    Data:\n    {\n        Starter:3\n        Time: 897\n    }\n}
+Server->Viewer2: {\n    Command: RunnerFinished,\n    Data:\n    {\n        Starter:3\n        Time: 897\n    }\n}
+note over Server: Measurements End
 Server->Admin: {\n    Command: Status,\n    Data: Ready\n}
-Server->Viewer1: {\n    Command: MeasuredEnd,\n    Data: 897\n}
-Server->Viewer2: {\n    Command: MeasuredEnd,\n    Data: 897\n}
+Server->Viewer1: {\n    Command: Status,\n    Data: Ready\n}
+Server->Viewer2: {\n    Command: Status,\n    Data: Ready\n}

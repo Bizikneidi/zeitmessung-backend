@@ -1,4 +1,5 @@
-﻿using System.Net.WebSockets;
+﻿using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
@@ -70,7 +71,7 @@ namespace TimeMeasurement_Backend.Networking
             var toSend = new Message<StationCommands>
             {
                 Command = StationCommands.StartMeasuring,
-                Data = null
+                Data = RaceManager.Instance.Runners.Count()
             };
             Task.Run(async () => await SendMessageAsync(_station, toSend));
         }
