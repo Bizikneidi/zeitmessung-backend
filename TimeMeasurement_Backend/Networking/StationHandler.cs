@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
@@ -16,7 +15,7 @@ namespace TimeMeasurement_Backend.Networking
         /// </summary>
         private WebSocket _station;
 
-        public StationHandler() => TimeMeter.Instance.StateChanged += OnTimeMeterStateChanged;
+        public StationHandler() => RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
 
         /// <summary>
         /// Connect with station and listen for its messages
@@ -32,7 +31,7 @@ namespace TimeMeasurement_Backend.Networking
             }
 
             _station = ws;
-            TimeMeter.Instance.Ready(); //The TimeMeter is now ready to start a measurement
+            RaceManager.Instance.Ready(); //The RaceManager is now ready to start a race
             await ListenAsync(_station);
         }
 
@@ -41,10 +40,11 @@ namespace TimeMeasurement_Backend.Networking
             switch (received.Command)
             {
                 case StationCommands.MeasuredStart: //Station has played a tone and recorded the start time
-                    TimeMeter.Instance.StartMeasurement((long)received.Data);
+                    RaceManager.Instance.Start();
+                    RaceManager.Instance.TimeMeter.StartMeasurements((long)received.Data);
                     break;
                 case StationCommands.MeasuredStop: //Station has detected that someone finished and recorded the end time
-                    TimeMeter.Instance.StopMeasurement((long)received.Data);
+                    RaceManager.Instance.TimeMeter.StopMeasurement((long)received.Data);
                     break;
                 default:
                     //Command does not exist
@@ -54,14 +54,14 @@ namespace TimeMeasurement_Backend.Networking
 
         protected override void OnDisconnect(WebSocket disconnected)
         {
-            TimeMeter.Instance.Disable(); //The TimeMeter is no longer ready to start a measurement
+            RaceManager.Instance.Disable(); //The RaceManager is no longer ready to start a race
             _station = null;
         }
 
-        private void OnTimeMeterStateChanged(TimeMeter.State prev, TimeMeter.State current)
+        private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
         {
-            //Only act, if timemeter has requested the start of a measurement
-            if (current != TimeMeter.State.MeasurementRequested)
+            //Only act, if Race Manager has requested the start of a race
+            if (current != RaceManager.State.StartRequested)
             {
                 return;
             }
@@ -73,7 +73,6 @@ namespace TimeMeasurement_Backend.Networking
                 Data = null
             };
             Task.Run(async () => await SendMessageAsync(_station, toSend));
-            File.AppendAllLines("log.txt", new []{"SENT"});
         }
     }
 }

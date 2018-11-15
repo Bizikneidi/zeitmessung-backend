@@ -1,8 +1,12 @@
-﻿namespace TimeMeasurement_Backend.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace TimeMeasurement_Backend.Entities
 {
     /// <summary>
     /// An Entity to record when somebody started and finished their run
     /// </summary>
+    [Owned]
     public class Time
     {
         /// <summary>

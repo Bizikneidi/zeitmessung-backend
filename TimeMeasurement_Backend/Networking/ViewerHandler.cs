@@ -19,7 +19,7 @@ namespace TimeMeasurement_Backend.Networking
         public ViewerHandler()
         {
             _viewers = new List<WebSocket>();
-            TimeMeter.Instance.StateChanged += OnTimeMeterStateChanged;
+            RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
         }
 
         /// <summary>
@@ -31,7 +31,6 @@ namespace TimeMeasurement_Backend.Networking
         {
             _viewers.Add(viewer);
             await SendCurrentStateTo(viewer);
-            //Simply listen for messages
             await ListenAsync(viewer);
         }
 
@@ -46,44 +45,43 @@ namespace TimeMeasurement_Backend.Networking
             _viewers.Remove(disconnected);
         }
 
-        private void OnTimeMeterStateChanged(TimeMeter.State prev, TimeMeter.State current)
+        private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
         {
             //Broadcast current state
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Status,
-                Data = TimeMeter.Instance.CurrentState
+                Data = RaceManager.Instance.CurrentState
             };
             Task.Run(async () => await BroadcastMessageAsync(_viewers, toSend));
 
             //Broadcast additional data on certain states
             switch (current)
             {
-                case TimeMeter.State.Measuring:
+                case RaceManager.State.InProgress:
                 {
-                    //The time meter has started a measurement
-                    //Notfiy all viewers
+                    //Send start
                     var message = new Message<ViewerCommands>
                     {
-                        Command = ViewerCommands.MeasuredStart,
-                        Data = new MeasurementStart
+                        Command = ViewerCommands.RunStart,
+                        Data = new RunStart
                         {
-                            // ReSharper disable once PossibleInvalidOperationException
-                            StartTime = (long)TimeMeter.Instance.Measurement.Start,
-                            CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime
+                            StartTime = RaceManager.Instance.TimeMeter.StartTime,
+                            CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
+                            Runners = RaceManager.Instance.Runners
                         }
                     };
                     Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
                     break;
                 }
-                case TimeMeter.State.Ready when prev == TimeMeter.State.Measuring:
+                case RaceManager.State.Ready when prev == RaceManager.State.InProgress:
                 {
-                    //The time meter has completed a measurement
+                    //The race has ended
                     //Notfiy all viewers
                     var message = new Message<ViewerCommands>
                     {
-                        Command = ViewerCommands.MeasuredStop,
-                        Data = TimeMeter.Instance.Measurement.End
+                        Command = ViewerCommands.RunEnd,
+                        Data = null
                     };
                     Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
                     break;
@@ -101,45 +99,25 @@ namespace TimeMeasurement_Backend.Networking
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Status,
-                Data = TimeMeter.Instance.CurrentState
+                Data = RaceManager.Instance.CurrentState
             };
             await SendMessageAsync(receiver, toSend);
 
-            //If time is being measured
-            if (TimeMeter.Instance.CurrentState == TimeMeter.State.Measuring)
+            if (RaceManager.Instance.CurrentState == RaceManager.State.InProgress)
             {
-                //Send start time and current station time to allow client to calculate time differences and run local timer
+                //Send start
                 var message = new Message<ViewerCommands>
                 {
-                    Command = ViewerCommands.MeasuredStart,
-                    Data = new MeasurementStart
+                    Command = ViewerCommands.RunStart,
+                    Data = new RunStart
                     {
-                        // ReSharper disable once PossibleInvalidOperationException
-                        StartTime = (long)TimeMeter.Instance.Measurement.Start,
-                        CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime
+                        StartTime = RaceManager.Instance.TimeMeter.StartTime,
+                        CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
+                        Runners = RaceManager.Instance.Runners
                     }
                 };
                 await SendMessageAsync(receiver, message);
             }
-        }
-
-        /// <summary>
-        /// entity to store the start and current time for state - and measurment start messages
-        /// Can be used by viewers to calculate time differences and run local timer
-        /// </summary>
-        private class MeasurementStart
-        {
-            /// <summary>
-            /// The current time of the station
-            /// </summary>
-            // ReSharper disable once UnusedAutoPropertyAccessor.Local
-            public long CurrentTime { get; set; }
-
-            /// <summary>
-            /// The start time of the station
-            /// </summary>
-            // ReSharper disable once UnusedAutoPropertyAccessor.Local
-            public long StartTime { get; set; }
         }
     }
 }

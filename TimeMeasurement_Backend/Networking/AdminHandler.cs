@@ -1,5 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
 
@@ -15,7 +17,11 @@ namespace TimeMeasurement_Backend.Networking
         /// </summary>
         private WebSocket _admin;
 
-        public AdminHandler() => TimeMeter.Instance.StateChanged += OnTimeMeterStateChanged;
+        public AdminHandler()
+        {
+            RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
+            RaceManager.Instance.TimeMeter.OnMeasurement += OnTimeMeterMeasurement;
+        }
 
         /// <summary>
         /// Connect with admin and listen for his/her messages
@@ -37,14 +43,18 @@ namespace TimeMeasurement_Backend.Networking
 
         protected override void HandleMessage(WebSocket sender, Message<AdminCommands> received)
         {
-            if (received.Command != AdminCommands.Start)
+            switch (received.Command)
             {
-                return;
+                case AdminCommands.Start:
+                    //Admin has pressed start
+                    //Tell time meter to start measuring
+                    RaceManager.Instance.RequestStart();
+                    break;
+                case AdminCommands.AssignTime:
+                    var assignment = ((JObject)received.Data).ToObject<Assignment>();
+                    RaceManager.Instance.AssignTimeToRunner(assignment.Starter, assignment.Time);
+                    break;
             }
-
-            //Admin has pressed start
-            //Tell time meter to start measuring
-            TimeMeter.Instance.RequestMeasurement();
         }
 
         protected override void OnDisconnect(WebSocket disconnected)
@@ -52,10 +62,21 @@ namespace TimeMeasurement_Backend.Networking
             _admin = null;
         }
 
-        private void OnTimeMeterStateChanged(TimeMeter.State prev, TimeMeter.State current)
+        private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
         {
             //Notify admin
             Task.Run(async () => await SendCurrentState());
+        }
+
+        private void OnTimeMeterMeasurement(Time time)
+        {
+            //Send time to admin, to map to runner
+            var message = new Message<AdminCommands>
+            {
+                Command = AdminCommands.MeasuredStop,
+                Data = time.End
+            };
+            Task.Run(async () => await SendMessageAsync(_admin, message));
         }
 
         /// <summary>
@@ -67,9 +88,41 @@ namespace TimeMeasurement_Backend.Networking
             var toSend = new Message<AdminCommands>
             {
                 Command = AdminCommands.Status,
-                Data = TimeMeter.Instance.CurrentState
+                Data = RaceManager.Instance.CurrentState
             };
             await SendMessageAsync(_admin, toSend);
+
+            if (RaceManager.Instance.CurrentState == RaceManager.State.InProgress)
+            {
+                //Send start
+                var message = new Message<AdminCommands>
+                {
+                    Command = AdminCommands.RunStart,
+                    Data = new RunStart
+                    {
+                        StartTime = RaceManager.Instance.TimeMeter.StartTime,
+                        CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
+                        Runners = RaceManager.Instance.Runners
+                    }
+                };
+                await SendMessageAsync(_admin, message);
+            }
+        }
+
+        /// <summary>
+        /// entity to map time with starter id
+        /// </summary>
+        public class Assignment
+        {
+            /// <summary>
+            /// The starter of the number
+            /// </summary>
+            public int Starter { get; set; }
+
+            /// <summary>
+            /// The time of the station
+            /// </summary>
+            public long Time { get; set; }
         }
     }
 }

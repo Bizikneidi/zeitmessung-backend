@@ -41,7 +41,6 @@ namespace TimeMeasurement_Backend
             //Register Custom Connection Handling
             app.Use(async (context, next) =>
             {
-
                 //Get request path
                 var path = context.Request.Path.Value.Split('/');
                 //Check if request is WS and path requestPath has value

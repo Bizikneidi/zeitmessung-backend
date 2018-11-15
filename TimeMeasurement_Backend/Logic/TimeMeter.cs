@@ -19,11 +19,6 @@ namespace TimeMeasurement_Backend.Logic
         private long _stationStartTime;
 
         /// <summary>
-        /// Event gets fired, whenever another time has been measured
-        /// </summary>
-        public event Action<Time> OnMeasurement;
-
-        /// <summary>
         /// Calculate the time of the station based on the difference between
         /// station start time and machine start time
         /// </summary>
@@ -36,6 +31,13 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
+        public long StartTime => _stationStartTime;
+
+        /// <summary>
+        /// Event gets fired, whenever another time has been measured
+        /// </summary>
+        public event Action<Time> OnMeasurement;
+
         /// <summary>
         /// State a measurement
         /// </summary>
@@ -46,7 +48,7 @@ namespace TimeMeasurement_Backend.Logic
             _stationStartTime = startTime;
             _serverStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
-        
+
         /// <summary>
         /// Stop a measurement
         /// </summary>
