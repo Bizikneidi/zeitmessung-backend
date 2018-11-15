@@ -47,11 +47,11 @@ namespace TimeMeasurement_Backend.Networking
             {
                 case AdminCommands.Start:
                     //Admin has pressed start
-                    //Tell time meter to start measuring
                     RaceManager.Instance.RequestStart();
                     break;
                 case AdminCommands.AssignTime:
-                    var assignment = ((JObject)received.Data).ToObject<Assignment>();
+                    //Admin has mapped a runner to a time
+                    var assignment = ((JObject)received.Data).ToObject<AssignmentDTO>();
                     RaceManager.Instance.AssignTimeToRunner(assignment.Starter, assignment.Time);
                     break;
             }
@@ -68,23 +68,25 @@ namespace TimeMeasurement_Backend.Networking
             Task.Run(async () => await SendCurrentState());
         }
 
-        private void OnTimeMeterMeasurement(Time time)
+        private void OnTimeMeterMeasurement(long time)
         {
             //Send time to admin, to map to runner
             var message = new Message<AdminCommands>
             {
                 Command = AdminCommands.MeasuredStop,
-                Data = time.End
+                Data = time
             };
             Task.Run(async () => await SendMessageAsync(_admin, message));
         }
 
         /// <summary>
         /// Tell the admin wether he is allowed to start a measurement / if not tell him/her why
+        /// if run is in progress, send the race data
         /// </summary>
         /// <returns></returns>
         private async Task SendCurrentState()
         {
+            //Send status
             var toSend = new Message<AdminCommands>
             {
                 Command = AdminCommands.Status,
@@ -94,11 +96,11 @@ namespace TimeMeasurement_Backend.Networking
 
             if (RaceManager.Instance.CurrentState == RaceManager.State.InProgress)
             {
-                //Send start
+                //Send basic race data
                 var message = new Message<AdminCommands>
                 {
                     Command = AdminCommands.RunStart,
-                    Data = new RunStart
+                    Data = new RunStartDTO
                     {
                         StartTime = RaceManager.Instance.TimeMeter.StartTime,
                         CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
@@ -107,22 +109,6 @@ namespace TimeMeasurement_Backend.Networking
                 };
                 await SendMessageAsync(_admin, message);
             }
-        }
-
-        /// <summary>
-        /// entity to map time with starter id
-        /// </summary>
-        public class Assignment
-        {
-            /// <summary>
-            /// The starter of the number
-            /// </summary>
-            public int Starter { get; set; }
-
-            /// <summary>
-            /// The time of the station
-            /// </summary>
-            public long Time { get; set; }
         }
     }
 }

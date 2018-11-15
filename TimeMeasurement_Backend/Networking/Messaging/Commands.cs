@@ -10,7 +10,7 @@ namespace TimeMeasurement_Backend.Networking.Messaging
 
         //STATION -> SERVER
         MeasuredStart = 1, //Message contains the start time
-        MeasuredStop = 2 //Message contains the stop time
+        MeasuredStop = 2 //Message contains a stop time
     }
 
     public enum AdminCommands
@@ -27,36 +27,23 @@ namespace TimeMeasurement_Backend.Networking.Messaging
 
     public enum ViewerCommands
     {
+        //SERVER -> VIEWER
         Status = 0, //Message contains the current time measurement status
         RunStart = 1, //Message contains the time and all runners
-        MeasuredStop = 2, //Message contains a stop time
+        RunnerFinished = 2, //Message contains a runner who finished the race
         RunEnd = 4 //The run has ended (data is null)
+
+        //VIEWER -> SERVER
+        //nothing here yet...
     }
 
     public enum ParticipantCommands
     {
+        //SERVER -> PARTICIPANT
+        //nothing here yet...
+
+        //PARTICIPANT -> SERVER
         Register = 0 //Message contains data to register as a participant
     }
 
-    /// <summary>
-    /// entity to store the start and current time for run
-    /// Can be used by viewers and admin to calculate time differences and run local timer
-    /// </summary>
-    public class RunStart
-    {
-        /// <summary>
-        /// The current time of the station
-        /// </summary>
-        public long CurrentTime { get; set; }
-
-        /// <summary>
-        /// All the runners in a race
-        /// </summary>
-        public IEnumerable<Runner> Runners { get; set; }
-
-        /// <summary>
-        /// The start time of the station
-        /// </summary>
-        public long StartTime { get; set; }
-    }
 }

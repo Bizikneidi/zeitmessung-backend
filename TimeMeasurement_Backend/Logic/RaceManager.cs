@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TimeMeasurement_Backend.Entities;
+using TimeMeasurement_Backend.Entities.Constraints;
 using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend.Logic
@@ -19,12 +20,26 @@ namespace TimeMeasurement_Backend.Logic
             Disabled //The time meter can not start a measurement and nobody can request one
         }
 
-        private readonly TimeMeasurementRepository<Participant> _participantRepo;
-        private readonly TimeMeasurementRepository<Race> _raceRepo;
-        private readonly TimeMeasurementRepository<Runner> _runnerRepo;
-        private Race _currentRace;
+        public static RaceManager Instance { get; } = new RaceManager();
 
         private State _currentState;
+        
+        /// <summary>
+        /// Event to allow others to act accoring to the current state of the time meter
+        /// </summary>
+        public event Action<State, State> StateChanged;
+        /// <summary>
+        /// Event to allow others to check, whenever a runner finishes the race
+        /// </summary>
+        public event Action<Runner> RunnerFinished;
+
+        private readonly TimeMeasurementRepository<Participant> _participantRepo;
+        private readonly TimeMeasurementRepository<Runner> _runnerRepo;
+        private readonly TimeMeasurementRepository<Race> _raceRepo;
+        private readonly List<long> _measurements;
+        private Race _currentRace;
+
+        public TimeMeter TimeMeter { get; }
 
         /// <summary>
         /// The current state of the time meter
@@ -40,43 +55,21 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
-        public static RaceManager Instance { get; } = new RaceManager();
-        public List<Time> Measurements { get; }
-
         public IEnumerable<Runner> Runners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id);
-
-        public TimeMeter TimeMeter { get; }
 
         private RaceManager()
         {
             TimeMeter = new TimeMeter();
-            TimeMeter.OnMeasurement += measurement => { Measurements.Add(measurement); };
+            TimeMeter.OnMeasurement += measurement => { _measurements.Add(measurement); };
 
-            Measurements = new List<Time>();
+            _measurements = new List<long>();
 
             _currentState = State.Disabled;
             _participantRepo = new TimeMeasurementRepository<Participant>();
             _runnerRepo = new TimeMeasurementRepository<Runner>();
             _raceRepo = new TimeMeasurementRepository<Race>();
         }
-
-        /// <summary>
-        /// Event to allow others to act accoring to the current state of the time meter
-        /// </summary>
-        public event Action<State, State> StateChanged;
-
-        /// <summary>
-        /// Assigns time to a runner
-        /// </summary>
-        /// <param name="starter"></param>
-        /// <param name="time"></param>
-        public void AssignTimeToRunner(int starter, long time)
-        {
-            var runner = _runnerRepo.Get(p => p.Starter == starter).First();
-            runner.Time = Measurements.Find(m => m.End == time);
-            _runnerRepo.Update(runner);
-        }
-
+        
         /// <summary>
         /// Allows others to set the time meter to disabled
         /// </summary>
@@ -120,10 +113,21 @@ namespace TimeMeasurement_Backend.Logic
 
             //Pass to TimeMeter
             CurrentState = State.InProgress;
-            Measurements.Clear();
+            _measurements.Clear();
             _currentRace = new Race { Date = DateTimeOffset.Now.ToUnixTimeMilliseconds() };
             _raceRepo.Create(_currentRace);
             RegisterRunners();
+        }
+
+        /// <summary>
+        /// Mapping all participants to runners (new object with a time entity)
+        /// </summary>
+        private void RegisterRunners()
+        {
+            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner { Starter = i, Participant = p, Race = _currentRace }))
+            {
+                _runnerRepo.Create(runner);
+            }
         }
 
         /// <summary>
@@ -136,14 +140,26 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Mapping all participants to runners (new object with a time entity)
+        /// Assigns time to a runner
         /// </summary>
-        private void RegisterRunners()
+        /// <param name="starter"></param>
+        /// <param name="time"></param>
+        public void AssignTimeToRunner(int starter, long time)
         {
-            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner { Starter = i, Participant = p, Race = _currentRace }))
+            if (!_measurements.Contains(time))
             {
-                _runnerRepo.Create(runner);
+                return;
             }
+
+            _measurements.Remove(time);
+            var runner = _runnerRepo.Get(p => p.Starter == starter).First();
+            runner.Time = new Time
+            {
+                Start = TimeMeter.StartTime,
+                End = time
+            };
+            _runnerRepo.Update(runner);
+            RunnerFinished?.Invoke(runner);
         }
     }
 }

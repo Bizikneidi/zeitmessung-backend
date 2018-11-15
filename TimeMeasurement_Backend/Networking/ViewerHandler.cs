@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
 
@@ -20,6 +21,7 @@ namespace TimeMeasurement_Backend.Networking
         {
             _viewers = new List<WebSocket>();
             RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
+            RaceManager.Instance.RunnerFinished += OnRaceManagerRunnerFinished;
         }
 
         /// <summary>
@@ -45,6 +47,17 @@ namespace TimeMeasurement_Backend.Networking
             _viewers.Remove(disconnected);
         }
 
+        private void OnRaceManagerRunnerFinished(Runner runner)
+        {
+            //Broadcast finished runner
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.RunnerFinished,
+                Data = runner
+            };
+            Task.Run(async () => await BroadcastMessageAsync(_viewers, toSend));
+        }
+
         private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
         {
             //Broadcast current state
@@ -64,7 +77,7 @@ namespace TimeMeasurement_Backend.Networking
                     var message = new Message<ViewerCommands>
                     {
                         Command = ViewerCommands.RunStart,
-                        Data = new RunStart
+                        Data = new RunStartDTO
                         {
                             StartTime = RaceManager.Instance.TimeMeter.StartTime,
                             CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
@@ -77,7 +90,6 @@ namespace TimeMeasurement_Backend.Networking
                 case RaceManager.State.Ready when prev == RaceManager.State.InProgress:
                 {
                     //The race has ended
-                    //Notfiy all viewers
                     var message = new Message<ViewerCommands>
                     {
                         Command = ViewerCommands.RunEnd,
@@ -90,12 +102,13 @@ namespace TimeMeasurement_Backend.Networking
         }
 
         /// <summary>
-        /// Tell the viewer if time is being measured or not and why
+        /// Tell the viewer the current state of the race
         /// </summary>
         /// <param name="receiver"></param>
         /// <returns></returns>
         private async Task SendCurrentStateTo(WebSocket receiver)
         {
+            //Send status
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Status,
@@ -109,7 +122,7 @@ namespace TimeMeasurement_Backend.Networking
                 var message = new Message<ViewerCommands>
                 {
                     Command = ViewerCommands.RunStart,
-                    Data = new RunStart
+                    Data = new RunStartDTO
                     {
                         StartTime = RaceManager.Instance.TimeMeter.StartTime,
                         CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
