@@ -53,7 +53,11 @@ namespace TimeMeasurement_Backend.Networking
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.RunnerFinished,
-                Data = runner
+                Data = new AssignmentDTO
+                {
+                    Time = runner.Time.End,
+                    Starter = runner.Starter
+                }
             };
             Task.Run(async () => await BroadcastMessageAsync(_viewers, toSend));
         }
@@ -68,37 +72,24 @@ namespace TimeMeasurement_Backend.Networking
             };
             Task.Run(async () => await BroadcastMessageAsync(_viewers, toSend));
 
-            //Broadcast additional data on certain states
-            switch (current)
+            //Broadcast additional data if in progress
+            if (current != RaceManager.State.InProgress)
             {
-                case RaceManager.State.InProgress:
-                {
-                    //Send start
-                    var message = new Message<ViewerCommands>
-                    {
-                        Command = ViewerCommands.RunStart,
-                        Data = new RunStartDTO
-                        {
-                            StartTime = RaceManager.Instance.TimeMeter.StartTime,
-                            CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                            Runners = RaceManager.Instance.Runners
-                        }
-                    };
-                    Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
-                    break;
-                }
-                case RaceManager.State.Ready when prev == RaceManager.State.InProgress:
-                {
-                    //The race has ended
-                    var message = new Message<ViewerCommands>
-                    {
-                        Command = ViewerCommands.RunEnd,
-                        Data = null
-                    };
-                    Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
-                    break;
-                }
+                return;
             }
+
+            //Send start
+            var message = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.RunStart,
+                Data = new RunStartDTO
+                {
+                    StartTime = RaceManager.Instance.TimeMeter.StartTime,
+                    CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
+                    Runners = RaceManager.Instance.Runners
+                }
+            };
+            Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
         }
 
         /// <summary>
