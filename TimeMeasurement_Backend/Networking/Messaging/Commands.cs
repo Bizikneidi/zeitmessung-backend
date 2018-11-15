@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using TimeMeasurement_Backend.Entities;
-
-namespace TimeMeasurement_Backend.Networking.Messaging
+﻿namespace TimeMeasurement_Backend.Networking.Messaging
 {
     public enum StationCommands
     {
@@ -45,5 +42,4 @@ namespace TimeMeasurement_Backend.Networking.Messaging
         //PARTICIPANT -> SERVER
         Register = 0 //Message contains data to register as a participant
     }
-
 }

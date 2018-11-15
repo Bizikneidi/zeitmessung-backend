@@ -1,7 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
 
