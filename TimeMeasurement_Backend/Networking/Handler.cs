@@ -91,7 +91,6 @@ namespace TimeMeasurement_Backend.Networking
             {
                 OnDisconnect(ws);
             }
-
         }
 
         /// <summary>

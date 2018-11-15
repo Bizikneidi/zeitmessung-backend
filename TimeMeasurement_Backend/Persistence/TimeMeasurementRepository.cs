@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TimeMeasurement_Backend.Entities;
-using Newtonsoft.Json;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace TimeMeasurement_Backend.Persistence
 {
@@ -25,7 +24,8 @@ namespace TimeMeasurement_Backend.Persistence
                 db.Set<T>().Add(item);
                 db.SaveChanges();
             }
-	        throw new System.ArgumentException("added: " + JsonConvert.SerializeObject(item));
+
+            throw new ArgumentException("added: " + JsonConvert.SerializeObject(item));
         }
 
         /// <summary>

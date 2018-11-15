@@ -1,5 +1,4 @@
 ﻿using System;
-using TimeMeasurement_Backend.Entities;
 
 namespace TimeMeasurement_Backend.Logic
 {
@@ -14,16 +13,6 @@ namespace TimeMeasurement_Backend.Logic
         private long _serverStartTime;
 
         /// <summary>
-        /// The internal time of the station, at the time of StartMeasurements(starttime)
-        /// </summary>
-        private long _stationStartTime;
-
-        /// <summary>
-        /// Event gets fired, whenever another time has been measured
-        /// </summary>
-        public event Action<Time> OnMeasurement;
-
-        /// <summary>
         /// Calculate the time of the station based on the difference between
         /// station start time and machine start time
         /// </summary>
@@ -31,10 +20,20 @@ namespace TimeMeasurement_Backend.Logic
         {
             get
             {
-                long diff = _serverStartTime - _stationStartTime;
+                long diff = _serverStartTime - StartTime;
                 return DateTimeOffset.Now.ToUnixTimeMilliseconds() - diff;
             }
         }
+
+        /// <summary>
+        /// The internal time of the station, at the time of StartMeasurements(starttime)
+        /// </summary>
+        public long StartTime { get; private set; }
+
+        /// <summary>
+        /// Event gets fired, whenever another time has been measured
+        /// </summary>
+        public event Action<long> OnMeasurement;
 
         /// <summary>
         /// State a measurement
@@ -43,7 +42,7 @@ namespace TimeMeasurement_Backend.Logic
         public void StartMeasurements(long startTime)
         {
             //store current system time and station time
-            _stationStartTime = startTime;
+            StartTime = startTime;
             _serverStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
         
@@ -53,11 +52,7 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="endTime">the stop time of the measurement</param>
         public void StopMeasurement(long endTime)
         {
-            OnMeasurement?.Invoke(new Time
-            {
-                Start = _stationStartTime,
-                End = endTime
-            });
+            OnMeasurement?.Invoke(endTime);
         }
     }
 }

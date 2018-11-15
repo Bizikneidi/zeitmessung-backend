@@ -14,9 +14,14 @@ namespace TimeMeasurement_Backend.Persistence
         public DbSet<Participant> Participants { get; set; }
 
         /// <summary>
-        /// Mapping to table, storing every Time entity
+        /// Mapping to table, storing every Race entity
         /// </summary>
-        public DbSet<Time> Times { get; set; }
+        public DbSet<Race> Races { get; set; }
+
+        /// <summary>
+        /// Mapping to table, storing every Runner entity
+        /// </summary>
+        public DbSet<Runner> Runners { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
