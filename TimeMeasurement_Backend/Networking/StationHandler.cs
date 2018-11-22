@@ -41,8 +41,8 @@ namespace TimeMeasurement_Backend.Networking
             switch (received.Command)
             {
                 case StationCommands.MeasuredStart: //Station has played a tone and recorded the start time
-                    RaceManager.Instance.Start();
                     RaceManager.Instance.TimeMeter.StartMeasurements((long)received.Data);
+                    RaceManager.Instance.Start();
                     break;
                 case StationCommands.MeasuredStop: //Station has detected that someone finished and recorded the end time
                     RaceManager.Instance.TimeMeter.StopMeasurement((long)received.Data);

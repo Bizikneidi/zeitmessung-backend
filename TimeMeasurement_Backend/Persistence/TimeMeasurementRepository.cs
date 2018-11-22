@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Newtonsoft.Json;
 
 namespace TimeMeasurement_Backend.Persistence
@@ -21,11 +22,17 @@ namespace TimeMeasurement_Backend.Persistence
         {
             using (var db = new TimeMeasurementDbContext())
             {
-                db.Set<T>().Add(item);
-                db.SaveChanges();
+                try
+                {
+                    db.Set<T>().Attach(item);
+                    db.Set<T>().Add(item);
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
-
-            throw new ArgumentException("added: " + JsonConvert.SerializeObject(item));
         }
 
         /// <summary>
@@ -46,12 +53,17 @@ namespace TimeMeasurement_Backend.Persistence
         /// Get Objects from the DB
         /// </summary>
         /// <param name="predicate">The WHERE clause</param>
+        /// /// <param name="include">Object to include</param>
         /// <returns></returns>
-        public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null)
+        public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null, Expression<Func<T, object>> include = null)
         {
             using (var db = new TimeMeasurementDbContext())
             {
-                var query = db.Set<T>();
+                var query = (IQueryable<T>)db.Set<T>();
+                if (include != null)
+                {
+                    query = query.Include(include);
+                }
                 return predicate == null ? query.ToList() : query.Where(predicate).ToList();
             }
         }

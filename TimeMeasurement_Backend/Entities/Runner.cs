@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace TimeMeasurement_Backend.Entities
 {
     public class Runner
