@@ -116,7 +116,7 @@ namespace TimeMeasurement_Backend.Networking
                     {
                         StartTime = RaceManager.Instance.TimeMeter.StartTime,
                         CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                        Runners = RaceManager.Instance.Runners
+                        Runners = RaceManager.Instance.CurrentRunners
                     }
                 };
                 await SendMessageAsync(_admin, message);

@@ -45,7 +45,9 @@ namespace TimeMeasurement_Backend.Logic
 
         public static RaceManager Instance { get; } = new RaceManager();
 
-        public IEnumerable<Runner> Runners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
+        public IEnumerable<Race> Races => _currentRace == null ? _raceRepo.Get() : _raceRepo.Get(r => r.Id != _currentRace.Id);
+
+        public IEnumerable<Runner> CurrentRunners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
 
         public TimeMeter TimeMeter { get; }
 
@@ -97,7 +99,7 @@ namespace TimeMeasurement_Backend.Logic
             RunnerFinished?.Invoke(runner);
 
             //Every Runner has finished
-            if (Runners.All(r => r.Time != 0))
+            if (CurrentRunners.All(r => r.Time != 0))
             {
                 CurrentState = State.Ready;
             }
@@ -149,6 +151,11 @@ namespace TimeMeasurement_Backend.Logic
             _raceRepo.Create(_currentRace);
             RegisterRunners();
             CurrentState = State.InProgress;
+        }
+
+        public IEnumerable<Runner> GetRunners(int raceId)
+        {
+            return _runnerRepo.Get(r => r.Race.Id == raceId, r => r.Race, r => r.Participant);
         }
 
         /// <summary>
