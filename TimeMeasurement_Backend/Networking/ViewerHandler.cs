@@ -20,6 +20,7 @@ namespace TimeMeasurement_Backend.Networking
         public ViewerHandler()
         {
             _viewers = new List<WebSocket>();
+
             RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
             RaceManager.Instance.RunnerFinished += OnRaceManagerRunnerFinished;
         }
@@ -33,12 +34,16 @@ namespace TimeMeasurement_Backend.Networking
         {
             _viewers.Add(viewer);
             await SendCurrentStateTo(viewer);
+            await SendRaces(viewer);
             await ListenAsync(viewer);
         }
 
         protected override void HandleMessage(WebSocket sender, Message<ViewerCommands> received)
         {
-            //No messages yet
+            if (received.Command == ViewerCommands.GetRunners)
+            {
+                SendRacersTo(sender, (int)(long)received.Data);
+            }
         }
 
         protected override void OnDisconnect(WebSocket disconnected)
@@ -85,7 +90,7 @@ namespace TimeMeasurement_Backend.Networking
                         {
                             StartTime = RaceManager.Instance.TimeMeter.StartTime,
                             CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                            Runners = RaceManager.Instance.Runners
+                            Runners = RaceManager.Instance.CurrentRunners
                         }
                     };
                     Task.Run(async () => await BroadcastMessageAsync(_viewers, message));
@@ -130,11 +135,31 @@ namespace TimeMeasurement_Backend.Networking
                     {
                         StartTime = RaceManager.Instance.TimeMeter.StartTime,
                         CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                        Runners = RaceManager.Instance.Runners
+                        Runners = RaceManager.Instance.CurrentRunners
                     }
                 };
                 await SendMessageAsync(receiver, message);
             }
+        }
+
+        private void SendRacersTo(WebSocket receiver, int raceId)
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Runners,
+                Data = RaceManager.Instance.GetRunners(raceId)
+            };
+            Task.Run(async () => await SendMessageAsync(receiver, toSend));
+        }
+
+        private async Task SendRaces(WebSocket receiver)
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Races,
+                Data = RaceManager.Instance.Races
+            };
+            await SendMessageAsync(receiver, toSend);
         }
     }
 }

@@ -30,10 +30,12 @@
         Status = 0, //Message contains the current time measurement status
         RunStart = 1, //Message contains the time and all runners
         RunnerFinished = 2, //Message contains a runner who finished the race
-        RunEnd = 4 //The run has ended (data is null)
+        RunEnd = 4, //The run has ended (data is null),
+        Races = 5, //Message contains all races up to this point
+        Runners = 6, //Message contains all racers for a race
 
         //VIEWER -> SERVER
-        //nothing here yet...
+        GetRunners = 7 //Viewer is requesting all racers to a race
     }
 
     public enum ParticipantCommands
