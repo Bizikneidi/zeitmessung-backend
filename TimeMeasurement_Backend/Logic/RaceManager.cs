@@ -24,6 +24,7 @@ namespace TimeMeasurement_Backend.Logic
         private readonly TimeMeasurementRepository<Participant> _participantRepo;
         private readonly TimeMeasurementRepository<Race> _raceRepo;
         private readonly TimeMeasurementRepository<Runner> _runnerRepo;
+
         private Race _currentRace;
 
         private State _currentState;
@@ -44,18 +45,14 @@ namespace TimeMeasurement_Backend.Logic
 
         public static RaceManager Instance { get; } = new RaceManager();
 
-        public IEnumerable<Runner> Runners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race);
+        public IEnumerable<Runner> Runners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
 
         public TimeMeter TimeMeter { get; }
 
         private RaceManager()
         {
             TimeMeter = new TimeMeter();
-            TimeMeter.OnMeasurement += measurement =>
-            {
-                _measurements.Add(measurement);
-
-            };
+            TimeMeter.OnMeasurement += measurement => { _measurements.Add(measurement); };
 
             _measurements = new List<long>();
 
@@ -88,18 +85,22 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             _measurements.Remove(time);
+
             var runner = _runnerRepo.Get(r => r.Starter == starter).FirstOrDefault();
             if (runner == null)
             {
                 return;
             }
-            runner.Time = new Time
-            {
-                Start = TimeMeter.StartTime,
-                End = time
-            };
+
+            runner.Time = time;
             _runnerRepo.Update(runner);
             RunnerFinished?.Invoke(runner);
+
+            //Every Runner has finished
+            if (Runners.All(r => r.Time != 0))
+            {
+                CurrentState = State.Ready;
+            }
         }
 
         /// <summary>
@@ -127,7 +128,18 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public void RequestStart()
         {
-            if (CurrentState != State.Ready)
+            if (CurrentState == State.Ready)
+            {
+                CurrentState = State.StartRequested;
+            }
+        }
+
+        /// <summary>
+        /// Allows others to set the time meter to InProgress
+        /// </summary>
+        public void Start()
+        {
+            if (CurrentState != State.StartRequested)
             {
                 return;
             }
@@ -136,18 +148,7 @@ namespace TimeMeasurement_Backend.Logic
             _currentRace = new Race { Date = DateTimeOffset.Now.ToUnixTimeMilliseconds() };
             _raceRepo.Create(_currentRace);
             RegisterRunners();
-            CurrentState = State.StartRequested;
-        }
-
-        /// <summary>
-        /// Allows others to set the time meter to InProgress
-        /// </summary>
-        public void Start()
-        {
-            if (CurrentState == State.StartRequested)
-            {
-                CurrentState = State.InProgress;
-            }
+            CurrentState = State.InProgress;
         }
 
         /// <summary>
@@ -157,7 +158,8 @@ namespace TimeMeasurement_Backend.Logic
         private IEnumerable<Participant> GetNewParticipants()
         {
             var participants = _participantRepo.Get();
-            return participants.Where(p => _runnerRepo.Get(r => r.Participant.Id == p.Id, r => r.Participant).FirstOrDefault() == null);
+            var res= participants.Where(p => _runnerRepo.Get(r => r.Participant.Id == p.Id, r => r.Participant).FirstOrDefault() == null);
+            return res;
         }
 
         /// <summary>
@@ -165,7 +167,13 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         private void RegisterRunners()
         {
-            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner { Starter = i, Participant = p, Race = _currentRace, Time = new Time() }))
+            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner
+            {
+                Starter = i,
+                Participant = p,
+                Race = _currentRace,
+                Time = 0
+            }))
             {
                 _runnerRepo.Create(runner);
             }

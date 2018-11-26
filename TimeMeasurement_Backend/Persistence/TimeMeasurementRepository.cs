@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using Newtonsoft.Json;
 
 namespace TimeMeasurement_Backend.Persistence
 {
@@ -53,17 +51,20 @@ namespace TimeMeasurement_Backend.Persistence
         /// Get Objects from the DB
         /// </summary>
         /// <param name="predicate">The WHERE clause</param>
-        /// /// <param name="include">Object to include</param>
+        /// ///
+        /// <param name="includes">Objects to include</param>
         /// <returns></returns>
-        public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null, Expression<Func<T, object>> include = null)
+        public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null, params Expression<Func<T, object>>[] includes)
         {
             using (var db = new TimeMeasurementDbContext())
             {
                 var query = (IQueryable<T>)db.Set<T>();
-                if (include != null)
+                // ReSharper disable once InvertIf
+                if (includes != null)
                 {
-                    query = query.Include(include);
+                    query = includes.Aggregate(query, (current, include) => current.Include(include));
                 }
+
                 return predicate == null ? query.ToList() : query.Where(predicate).ToList();
             }
         }

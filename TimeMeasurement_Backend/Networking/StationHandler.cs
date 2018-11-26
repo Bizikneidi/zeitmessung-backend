@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.Messaging;
@@ -61,19 +60,32 @@ namespace TimeMeasurement_Backend.Networking
 
         private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
         {
-            //Only act, if Race Manager has requested the start of a race
-            if (current != RaceManager.State.StartRequested)
+            switch (current)
             {
-                return;
+                //Only act, if Race Manager has requested the start of a race
+                case RaceManager.State.StartRequested:
+                {
+                    //Tell station to play a tone and start measuring
+                    var toSend = new Message<StationCommands>
+                    {
+                        Command = StationCommands.StartMeasuring,
+                        Data = null
+                    };
+                    Task.Run(async () => await SendMessageAsync(_station, toSend));
+                    break;
+                }
+                case RaceManager.State.Ready when prev == RaceManager.State.InProgress:
+                {
+                    //Tell station to stop measuring
+                    var toSend = new Message<StationCommands>
+                    {
+                        Command = StationCommands.StopMeasuring,
+                        Data = null
+                    };
+                    Task.Run(async () => await SendMessageAsync(_station, toSend));
+                    break;
+                }
             }
-
-            //Tell station to play a tone and start measuring
-            var toSend = new Message<StationCommands>
-            {
-                Command = StationCommands.StartMeasuring,
-                Data = RaceManager.Instance.Runners.Count()
-            };
-            Task.Run(async () => await SendMessageAsync(_station, toSend));
         }
     }
 }

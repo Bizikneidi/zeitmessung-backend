@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Logic;
@@ -66,6 +65,19 @@ namespace TimeMeasurement_Backend.Networking
         {
             //Notify admin
             Task.Run(async () => await SendCurrentState());
+
+            if (current != RaceManager.State.Ready || prev != RaceManager.State.InProgress)
+            {
+                return;
+            }
+
+            //Tell station to stop measuring
+            var toSend = new Message<AdminCommands>
+            {
+                Command = AdminCommands.RunEnd,
+                Data = null
+            };
+            Task.Run(async () => await SendMessageAsync(_admin, toSend));
         }
 
         private void OnTimeMeterMeasurement(long time)
