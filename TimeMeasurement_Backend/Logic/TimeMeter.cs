@@ -45,14 +45,14 @@ namespace TimeMeasurement_Backend.Logic
             StartTime = startTime;
             _serverStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
-        
+
         /// <summary>
         /// Stop a measurement
         /// </summary>
         /// <param name="endTime">the stop time of the measurement</param>
         public void StopMeasurement(long endTime)
         {
-            OnMeasurement?.Invoke(endTime);
+            OnMeasurement?.Invoke(endTime - StartTime);
         }
     }
 }

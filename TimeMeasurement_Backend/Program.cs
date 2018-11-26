@@ -20,7 +20,7 @@ namespace TimeMeasurement_Backend
                     options.Listen(IPAddress.Any, 5000);
                     options.Listen(IPAddress.Any, 5001, listenOptions =>
                     {
-                        listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
+                        //listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
                     });
                 })
                 .UseStartup<Startup>()
