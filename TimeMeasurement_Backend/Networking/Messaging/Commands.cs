@@ -36,7 +36,6 @@
 
         //VIEWER -> SERVER
         GetRunners = 7 //Viewer is requesting all racers to a race
-
     }
 
     public enum ParticipantCommands

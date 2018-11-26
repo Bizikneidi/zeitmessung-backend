@@ -46,16 +46,6 @@ namespace TimeMeasurement_Backend.Networking
             }
         }
 
-        private void SendRacersTo(WebSocket receiver, int raceId)
-        {
-            var toSend = new Message<ViewerCommands>
-            {
-                Command = ViewerCommands.Runners,
-                Data = RaceManager.Instance.GetRunners(raceId)
-            };
-            Task.Run(async () => await SendMessageAsync(receiver, toSend));
-        }
-
         protected override void OnDisconnect(WebSocket disconnected)
         {
             //Remove from active viewers
@@ -75,16 +65,6 @@ namespace TimeMeasurement_Backend.Networking
                 }
             };
             Task.Run(async () => await BroadcastMessageAsync(_viewers, toSend));
-        }
-
-        private async Task SendRaces(WebSocket receiver)
-        {
-            var toSend = new Message<ViewerCommands>
-            {
-                Command = ViewerCommands.Races,
-                Data = RaceManager.Instance.Races
-            };
-            await SendMessageAsync(receiver, toSend);
         }
 
         private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
@@ -160,6 +140,26 @@ namespace TimeMeasurement_Backend.Networking
                 };
                 await SendMessageAsync(receiver, message);
             }
+        }
+
+        private void SendRacersTo(WebSocket receiver, int raceId)
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Runners,
+                Data = RaceManager.Instance.GetRunners(raceId)
+            };
+            Task.Run(async () => await SendMessageAsync(receiver, toSend));
+        }
+
+        private async Task SendRaces(WebSocket receiver)
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Races,
+                Data = RaceManager.Instance.Races
+            };
+            await SendMessageAsync(receiver, toSend);
         }
     }
 }

@@ -29,6 +29,8 @@ namespace TimeMeasurement_Backend.Logic
 
         private State _currentState;
 
+        public IEnumerable<Runner> CurrentRunners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
+
         /// <summary>
         /// The current state of the time meter
         /// </summary>
@@ -46,8 +48,6 @@ namespace TimeMeasurement_Backend.Logic
         public static RaceManager Instance { get; } = new RaceManager();
 
         public IEnumerable<Race> Races => _currentRace == null ? _raceRepo.Get() : _raceRepo.Get(r => r.Id != _currentRace.Id);
-
-        public IEnumerable<Runner> CurrentRunners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
 
         public TimeMeter TimeMeter { get; }
 
@@ -113,6 +113,11 @@ namespace TimeMeasurement_Backend.Logic
             CurrentState = State.Disabled;
         }
 
+        public IEnumerable<Runner> GetRunners(int raceId)
+        {
+            return _runnerRepo.Get(r => r.Race.Id == raceId, r => r.Race, r => r.Participant);
+        }
+
         /// <summary>
         /// Allows others to set the time meter to ready
         /// </summary>
@@ -153,11 +158,6 @@ namespace TimeMeasurement_Backend.Logic
             CurrentState = State.InProgress;
         }
 
-        public IEnumerable<Runner> GetRunners(int raceId)
-        {
-            return _runnerRepo.Get(r => r.Race.Id == raceId, r => r.Race, r => r.Participant);
-        }
-
         /// <summary>
         /// Querying through all participants, getting all where no runner exists
         /// </summary>
@@ -165,7 +165,7 @@ namespace TimeMeasurement_Backend.Logic
         private IEnumerable<Participant> GetNewParticipants()
         {
             var participants = _participantRepo.Get();
-            var res= participants.Where(p => _runnerRepo.Get(r => r.Participant.Id == p.Id, r => r.Participant).FirstOrDefault() == null);
+            var res = participants.Where(p => _runnerRepo.Get(r => r.Participant.Id == p.Id, r => r.Participant).FirstOrDefault() == null);
             return res;
         }
 
