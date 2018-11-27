@@ -23,7 +23,7 @@ namespace TimeMeasurement_Backend
                         {
                             listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
                         });
-                    } catch (Exception ex) {
+                    } catch {
 
                     }
                 })
