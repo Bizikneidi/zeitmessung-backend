@@ -18,10 +18,14 @@ namespace TimeMeasurement_Backend
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Any, 5000);
-                    options.Listen(IPAddress.Any, 5001, listenOptions =>
-                    {
-                        //listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
-                    });
+                    try {
+                        options.Listen(IPAddress.Any, 5001, listenOptions =>
+                        {
+                            listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
+                        });
+                    } catch (Exception ex) {
+
+                    }
                 })
                 .UseStartup<Startup>()
                 .UseConfiguration(config)
