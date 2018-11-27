@@ -24,9 +24,12 @@ namespace TimeMeasurement_Backend.Logic
         private readonly TimeMeasurementRepository<Participant> _participantRepo;
         private readonly TimeMeasurementRepository<Race> _raceRepo;
         private readonly TimeMeasurementRepository<Runner> _runnerRepo;
+
         private Race _currentRace;
 
         private State _currentState;
+
+        public IEnumerable<Runner> CurrentRunners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
 
         /// <summary>
         /// The current state of the time meter
@@ -44,7 +47,7 @@ namespace TimeMeasurement_Backend.Logic
 
         public static RaceManager Instance { get; } = new RaceManager();
 
-        public IEnumerable<Runner> Runners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id);
+        public IEnumerable<Race> Races => _currentRace == null ? _raceRepo.Get() : _raceRepo.Get(r => r.Id != _currentRace.Id);
 
         public TimeMeter TimeMeter { get; }
 
@@ -84,14 +87,22 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             _measurements.Remove(time);
-            var runner = _runnerRepo.Get(p => p.Starter == starter).First();
-            runner.Time = new Time
+
+            var runner = _runnerRepo.Get(r => r.Starter == starter).FirstOrDefault();
+            if (runner == null)
             {
-                Start = TimeMeter.StartTime,
-                End = time
-            };
+                return;
+            }
+
+            runner.Time = time;
             _runnerRepo.Update(runner);
             RunnerFinished?.Invoke(runner);
+
+            //Every Runner has finished
+            if (CurrentRunners.All(r => r.Time != 0))
+            {
+                CurrentState = State.Ready;
+            }
         }
 
         /// <summary>
@@ -100,6 +111,11 @@ namespace TimeMeasurement_Backend.Logic
         public void Disable()
         {
             CurrentState = State.Disabled;
+        }
+
+        public IEnumerable<Runner> GetRunners(int raceId)
+        {
+            return _runnerRepo.Get(r => r.Race.Id == raceId, r => r.Race, r => r.Participant);
         }
 
         /// <summary>
@@ -135,12 +151,11 @@ namespace TimeMeasurement_Backend.Logic
                 return;
             }
 
-            //Pass to TimeMeter
-            CurrentState = State.InProgress;
             _measurements.Clear();
             _currentRace = new Race { Date = DateTimeOffset.Now.ToUnixTimeMilliseconds() };
             _raceRepo.Create(_currentRace);
             RegisterRunners();
+            CurrentState = State.InProgress;
         }
 
         /// <summary>
@@ -149,7 +164,9 @@ namespace TimeMeasurement_Backend.Logic
         /// <returns>new participants</returns>
         private IEnumerable<Participant> GetNewParticipants()
         {
-            return _participantRepo.Get(p => !_runnerRepo.Get(r => r.Participant.Id == p.Id).Any());
+            var participants = _participantRepo.Get();
+            var res = participants.Where(p => _runnerRepo.Get(r => r.Participant.Id == p.Id, r => r.Participant).FirstOrDefault() == null);
+            return res;
         }
 
         /// <summary>
@@ -157,7 +174,13 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         private void RegisterRunners()
         {
-            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner { Starter = i, Participant = p, Race = _currentRace }))
+            foreach (var runner in GetNewParticipants().Select((p, i) => new Runner
+            {
+                Starter = i,
+                Participant = p,
+                Race = _currentRace,
+                Time = 0
+            }))
             {
                 _runnerRepo.Create(runner);
             }

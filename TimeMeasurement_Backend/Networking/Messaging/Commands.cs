@@ -3,11 +3,12 @@
     public enum StationCommands
     {
         //SERVER -> STATION
-        StartMeasuring = 0, //Station should start measuring the time
+        StartMeasuring = 0, //Station should start measuring times
+        StopMeasuring = 1, //Station should stop measuring times
 
         //STATION -> SERVER
-        MeasuredStart = 1, //Message contains the start time
-        MeasuredStop = 2 //Message contains a stop time
+        MeasuredStart = 2, //Message contains the start time
+        MeasuredStop = 3 //Message contains a stop time
     }
 
     public enum AdminCommands
@@ -16,6 +17,7 @@
         Status = 0, //Message contains the current time measurement status
         RunStart = 1, //Message contains the time and all runners
         MeasuredStop = 2, //Message contains a stop time
+        RunEnd = 3, //The run has ended (data is null)
 
         //ADMIN -> SERVER
         Start = 4, //Admin has pressed the start button and server should start a race
@@ -28,10 +30,12 @@
         Status = 0, //Message contains the current time measurement status
         RunStart = 1, //Message contains the time and all runners
         RunnerFinished = 2, //Message contains a runner who finished the race
-        RunEnd = 4 //The run has ended (data is null)
+        RunEnd = 4, //The run has ended (data is null),
+        Races = 5, //Message contains all races up to this point
+        Runners = 6, //Message contains all racers for a race
 
         //VIEWER -> SERVER
-        //nothing here yet...
+        GetRunners = 7 //Viewer is requesting all racers to a race
     }
 
     public enum ParticipantCommands

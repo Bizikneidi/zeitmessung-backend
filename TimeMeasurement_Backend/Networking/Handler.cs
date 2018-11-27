@@ -87,7 +87,7 @@ namespace TimeMeasurement_Backend.Networking
                     HandleMessage(ws, received);
                 }
             }
-            catch (Exception) //Client has force closed the connection
+            catch (Exception ex) //Client has force closed the connection
             {
                 OnDisconnect(ws);
             }

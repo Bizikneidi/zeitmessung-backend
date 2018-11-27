@@ -6,6 +6,6 @@ namespace TimeMeasurement_Backend.Entities
         public Participant Participant { get; set; }
         public Race Race { get; set; }
         public int Starter { get; set; }
-        public Time Time { get; set; }
+        public long Time { get; set; }
     }
 }
