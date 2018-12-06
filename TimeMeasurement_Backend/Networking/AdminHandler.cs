@@ -120,6 +120,10 @@ namespace TimeMeasurement_Backend.Networking
                     }
                 };
                 await SendMessageAsync(_admin, message);
+                foreach (long measurement in RaceManager.Instance.UnassignedMeasurements)
+                {
+                    OnTimeMeterMeasurement(measurement);
+                }
             }
         }
     }

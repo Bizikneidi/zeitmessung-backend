@@ -31,6 +31,8 @@ namespace TimeMeasurement_Backend.Logic
 
         public IEnumerable<Runner> CurrentRunners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
 
+        public IEnumerable<long> UnassignedMeasurements => _measurements;
+
         /// <summary>
         /// The current state of the time meter
         /// </summary>
