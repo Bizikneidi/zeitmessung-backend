@@ -42,7 +42,7 @@ namespace TimeMeasurement_Backend.Networking
         {
             if (received.Command == ViewerCommands.GetRunners)
             {
-                SendRacersTo(sender, int.Parse((string)received.Data));
+                SendRacersTo(sender, (int)(long)received.Data);
             }
         }
 
