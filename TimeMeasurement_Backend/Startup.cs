@@ -32,7 +32,6 @@ namespace TimeMeasurement_Backend
             var adminHandler = new AdminHandler();
             var stationHandler = new StationHandler();
             var viewerHandler = new ViewerHandler();
-
             var participantHandler = new ParticipantHandler();
 
             //app.UseHttpsRedirection();
