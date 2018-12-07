@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -23,8 +24,8 @@ namespace TimeMeasurement_Backend
                         {
                             listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
                         });
-                    } catch {
-
+                    } catch (Exception ex) {
+                        Console.WriteLine(ex);
                     }
                 })
                 .UseStartup<Startup>()

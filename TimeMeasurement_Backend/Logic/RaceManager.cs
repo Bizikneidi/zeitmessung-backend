@@ -81,11 +81,11 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         /// <param name="starter"></param>
         /// <param name="time"></param>
-        public void AssignTimeToRunner(int starter, long time)
+        public bool TryAssignTimeToRunner(int starter, long time)
         {
             if (!_measurements.Contains(time))
             {
-                return;
+                return false;
             }
 
             _measurements.Remove(time);
@@ -93,7 +93,7 @@ namespace TimeMeasurement_Backend.Logic
             var runner = _runnerRepo.Get(r => r.Starter == starter).FirstOrDefault();
             if (runner == null)
             {
-                return;
+                return false;
             }
 
             runner.Time = time;
@@ -105,6 +105,8 @@ namespace TimeMeasurement_Backend.Logic
             {
                 CurrentState = State.Ready;
             }
+
+            return true;
         }
 
         /// <summary>

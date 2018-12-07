@@ -51,7 +51,10 @@ namespace TimeMeasurement_Backend.Networking
                 case AdminCommands.AssignTime:
                     //Admin has mapped a runner to a time
                     var assignment = ((JObject)received.Data).ToObject<AssignmentDTO>();
-                    RaceManager.Instance.AssignTimeToRunner(assignment.Starter, assignment.Time);
+                    if (!RaceManager.Instance.TryAssignTimeToRunner(assignment.Starter, assignment.Time))
+                    {
+                        OnTimeMeterMeasurement(assignment.Time);
+                    }
                     break;
             }
         }
@@ -66,18 +69,19 @@ namespace TimeMeasurement_Backend.Networking
             //Notify admin
             Task.Run(async () => await SendCurrentState());
 
-            if (current != RaceManager.State.Ready || prev != RaceManager.State.InProgress)
+            if ((current != RaceManager.State.Ready && current != RaceManager.State.Disabled) || prev != RaceManager.State.InProgress)
             {
                 return;
             }
 
-            //Tell station to stop measuring
             var toSend = new Message<AdminCommands>
             {
                 Command = AdminCommands.RunEnd,
                 Data = null
             };
             Task.Run(async () => await SendMessageAsync(_admin, toSend));
+
+            //Tell station to stop measuring
         }
 
         private void OnTimeMeterMeasurement(long time)

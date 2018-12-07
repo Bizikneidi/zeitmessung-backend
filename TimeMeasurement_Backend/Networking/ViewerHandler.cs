@@ -97,7 +97,8 @@ namespace TimeMeasurement_Backend.Networking
                     break;
                 }
                 case RaceManager.State.Ready when prev == RaceManager.State.InProgress:
-                {
+                case RaceManager.State.Disabled when prev == RaceManager.State.InProgress:
+                    {
                     //Send end
                     var message = new Message<ViewerCommands>
                     {
