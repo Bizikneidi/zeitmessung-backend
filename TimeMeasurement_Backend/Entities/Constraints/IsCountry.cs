@@ -11,7 +11,6 @@ namespace TimeMeasurement_Backend.Entities.Constraints
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            //Can not ve null
             if (value == null)
             {
                 return new ValidationResult("Input was null");
@@ -19,7 +18,7 @@ namespace TimeMeasurement_Backend.Entities.Constraints
 
             string code = ((string)value).ToUpper();
             var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures); //Get all known cultures
-            return cultures.Select(culture => new RegionInfo(culture.LCID)) //Get all cultures
+            return cultures.Select(culture => new RegionInfo(culture.LCID)) //Get all regions
                 .Any(region => code == region.TwoLetterISORegionName.ToUpper())
                 ? //Check if any code matches
                 ValidationResult.Success

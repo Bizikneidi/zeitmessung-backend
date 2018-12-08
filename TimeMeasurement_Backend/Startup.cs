@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TimeMeasurement_Backend.Networking;
+using TimeMeasurement_Backend.Networking.Handlers;
 using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend
@@ -34,8 +34,8 @@ namespace TimeMeasurement_Backend
             var viewerHandler = new ViewerHandler();
             var participantHandler = new ParticipantHandler();
 
-            //app.UseHttpsRedirection();
-            //app.UseHsts();
+            app.UseHttpsRedirection();
+            app.UseHsts();
             app.UseWebSockets();
 
             //Register Custom Connection Handling
@@ -69,7 +69,7 @@ namespace TimeMeasurement_Backend
                 }
                 else
                 {
-                    //Pass to next handler (registered by ASP)
+                    //Pass to next handler (registered by the runtime)
                     await next.Invoke();
                 }
             });

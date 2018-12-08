@@ -11,7 +11,6 @@ namespace TimeMeasurement_Backend.Entities.Constraints
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            //Email must not be null
             if (value == null)
             {
                 return new ValidationResult("Input was null");

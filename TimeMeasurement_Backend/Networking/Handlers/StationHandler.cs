@@ -1,12 +1,12 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
-using TimeMeasurement_Backend.Networking.Messaging;
+using TimeMeasurement_Backend.Networking.MessageData;
 
-namespace TimeMeasurement_Backend.Networking
+namespace TimeMeasurement_Backend.Networking.Handlers
 {
     /// <summary>
-    /// Handles websocket connection with a station
+    /// Handles a websocket connection with a station
     /// </summary>
     public class StationHandler : Handler<StationCommands>
     {
@@ -62,7 +62,6 @@ namespace TimeMeasurement_Backend.Networking
         {
             switch (current)
             {
-                //Only act, if Race Manager has requested the start of a race
                 case RaceManager.State.StartRequested:
                 {
                     //Tell station to play a tone and start measuring
@@ -71,7 +70,7 @@ namespace TimeMeasurement_Backend.Networking
                         Command = StationCommands.StartMeasuring,
                         Data = null
                     };
-                    Task.Run(async () => await SendMessageAsync(_station, toSend));
+                    SendMessage(_station, toSend);
                     break;
                 }
                 case RaceManager.State.Ready when prev == RaceManager.State.InProgress:
@@ -82,7 +81,7 @@ namespace TimeMeasurement_Backend.Networking
                         Command = StationCommands.StopMeasuring,
                         Data = null
                     };
-                    Task.Run(async () => await SendMessageAsync(_station, toSend));
+                    SendMessage(_station, toSend);
                     break;
                 }
             }
