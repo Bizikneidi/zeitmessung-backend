@@ -20,16 +20,9 @@ namespace TimeMeasurement_Backend.Persistence
         {
             using (var db = new TimeMeasurementDbContext())
             {
-                try
-                {
-                    db.Set<T>().Attach(item);
-                    db.Set<T>().Add(item);
-                    db.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
+                db.Set<T>().Attach(item);
+                db.Set<T>().Add(item);
+                db.SaveChanges();
             }
         }
 

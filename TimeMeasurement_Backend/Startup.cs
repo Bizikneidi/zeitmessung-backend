@@ -34,8 +34,8 @@ namespace TimeMeasurement_Backend
             var viewerHandler = new ViewerHandler();
             var participantHandler = new ParticipantHandler();
 
-            //app.UseHttpsRedirection();
-            //app.UseHsts();
+            app.UseHttpsRedirection();
+            app.UseHsts();
             app.UseWebSockets();
 
             //Register Custom Connection Handling
@@ -69,7 +69,7 @@ namespace TimeMeasurement_Backend
                 }
                 else
                 {
-                    //Pass to next handler (registered by ASP)
+                    //Pass to next handler (registered by the runtime)
                     await next.Invoke();
                 }
             });
