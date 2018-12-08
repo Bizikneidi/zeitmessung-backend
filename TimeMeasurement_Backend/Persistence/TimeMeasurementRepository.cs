@@ -9,7 +9,7 @@ namespace TimeMeasurement_Backend.Persistence
     /// <summary>
     /// A Generic Repository to do CRUD operations on the DB
     /// </summary>
-    /// <typeparam name="T">The Class to work with</typeparam>
+    /// <typeparam name="T">The Entity type to work with</typeparam>
     public class TimeMeasurementRepository<T> where T : class
     {
         /// <summary>
@@ -51,9 +51,8 @@ namespace TimeMeasurement_Backend.Persistence
         /// Get Objects from the DB
         /// </summary>
         /// <param name="predicate">The WHERE clause</param>
-        /// ///
         /// <param name="includes">Objects to include</param>
-        /// <returns></returns>
+        /// <returns>All entites matching the WHERE clause and the data requested in includes</returns>
         public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null, params Expression<Func<T, object>>[] includes)
         {
             using (var db = new TimeMeasurementDbContext())
