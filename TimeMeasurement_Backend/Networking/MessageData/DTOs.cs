@@ -4,11 +4,10 @@ using TimeMeasurement_Backend.Entities;
 namespace TimeMeasurement_Backend.Networking.Messaging
 {
     /// <summary>
-    /// entity to store the basic information of the current race
-    /// Can be used by viewers and admin to calculate time differences and run local timer
+    /// Used to transfer basic data about the current race
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public class RunStartDTO
+    public class RaceStartDTO
     {
         /// <summary>
         /// The current time of the station
@@ -16,7 +15,7 @@ namespace TimeMeasurement_Backend.Networking.Messaging
         public long CurrentTime { get; set; }
 
         /// <summary>
-        /// All the runners in a race
+        /// All the runners in the current race
         /// </summary>
         public IEnumerable<Runner> Runners { get; set; }
 
@@ -27,7 +26,7 @@ namespace TimeMeasurement_Backend.Networking.Messaging
     }
 
     /// <summary>
-    /// entity to map time with starter number
+    /// Used to transfer a starter number and a time to assign a runner his time
     /// </summary>
     // ReSharper disable once InconsistentNaming
     public class AssignmentDTO
@@ -38,7 +37,7 @@ namespace TimeMeasurement_Backend.Networking.Messaging
         public int Starter { get; set; }
 
         /// <summary>
-        /// The time oof the runner
+        /// The time of the runner
         /// </summary>
         public long Time { get; set; }
     }

@@ -21,22 +21,21 @@ namespace TimeMeasurement_Backend.Networking
         /// </summary>
         /// <param name="receivers">The target websockets</param>
         /// <param name="toBroadcast">The message</param>
-        protected async Task BroadcastMessageAsync(IEnumerable<WebSocket> receivers, Message<TCommands> toBroadcast)
+        protected void BroadcastMessage(IEnumerable<WebSocket> receivers, Message<TCommands> toBroadcast)
         {
             //Convert Message to JSON, then to byte[]
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(toBroadcast));
             //Arraysegment with length of not 0 bytes
             var segment = new ArraySegment<byte>(data, 0, data.Count(b => b != 0));
-            //Parallel due to await
+            //Send to all
             foreach (var receiver in receivers)
             {
-                //Receiver must not be null
                 if (receiver == null)
                 {
-                    continue;
+                    return;
                 }
 
-                await receiver.SendAsync(
+                receiver.SendAsync(
                     segment,
                     WebSocketMessageType.Text,
                     true, //Message is not split
@@ -105,7 +104,7 @@ namespace TimeMeasurement_Backend.Networking
         /// <param name="receiver">The target websocket</param>
         /// <param name="toSend">The message</param>
         /// <returns></returns>
-        protected async Task SendMessageAsync(WebSocket receiver, Message<TCommands> toSend)
+        protected void SendMessage(WebSocket receiver, Message<TCommands> toSend)
         {
             //receiver must not be null
             if (receiver == null)
@@ -115,7 +114,8 @@ namespace TimeMeasurement_Backend.Networking
 
             //Convert Message to JSON, then to byte[]
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(toSend));
-            await receiver.SendAsync(
+
+            receiver.SendAsync(
                 new ArraySegment<byte>(data, 0, data.Count(b => b != 0)), //Arraysegment with length of not 0 bytes
                 WebSocketMessageType.Text,
                 true, //Message is not split

@@ -8,7 +8,7 @@ using TimeMeasurement_Backend.Persistence;
 namespace TimeMeasurement_Backend.Networking
 {
     /// <summary>
-    /// Handles websocket connection with an admin
+    /// Handles a websocket connection with a potential participant
     /// </summary>
     public class ParticipantHandler : Handler<ParticipantCommands>
     {
