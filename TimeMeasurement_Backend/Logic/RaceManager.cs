@@ -46,11 +46,6 @@ namespace TimeMeasurement_Backend.Logic
         public IEnumerable<Runner> CurrentRunners => _runnerRepo.Get(r => r.Race.Id == _currentRace.Id, r => r.Race, r => r.Participant);
 
         /// <summary>
-        /// All recorded measurements which are not assigned to a runner yet
-        /// </summary>
-        public IEnumerable<long> UnassignedMeasurements => _measurements;
-
-        /// <summary>
         /// The current state of the time meter
         /// </summary>
         public State CurrentState
@@ -76,6 +71,11 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public TimeMeter TimeMeter { get; }
 
+        /// <summary>
+        /// All recorded measurements which are not assigned to a runner yet
+        /// </summary>
+        public IEnumerable<long> UnassignedMeasurements => _measurements;
+
         private RaceManager()
         {
             TimeMeter = new TimeMeter();
@@ -98,43 +98,6 @@ namespace TimeMeasurement_Backend.Logic
         /// Event to allow others to act accoring to the current state of the time meter
         /// </summary>
         public event Action<State, State> StateChanged;
-
-        /// <summary>
-        /// Assigns a time to the runner with the starter if possible
-        /// </summary>
-        /// <param name="starter">the starter number of the runner</param>
-        /// <param name="time">the time to assign to the runner</param>
-        /// <returns>if the assignment was successful</returns>
-        public bool TryAssignTimeToRunner(int starter, long time)
-        {
-            //Prevent assigning faulty times to runners
-            if (!_measurements.Contains(time))
-            {
-                return false;
-            }
-
-            _measurements.Remove(time);
-
-            //Make sure a runner with the starter exists
-            var runner = _runnerRepo.Get(r => r.Starter == starter).FirstOrDefault();
-            if (runner == null)
-            {
-                return false;
-            }
-
-            //Assign the time
-            runner.Time = time;
-            _runnerRepo.Update(runner);
-            RunnerFinished?.Invoke(runner);
-
-            //Every Runner has finished
-            if (CurrentRunners.All(r => r.Time != 0))
-            {
-                CurrentState = State.Ready;
-            }
-
-            return true;
-        }
 
         /// <summary>
         /// Allows others to set the time meter to disabled
@@ -192,6 +155,43 @@ namespace TimeMeasurement_Backend.Logic
             _raceRepo.Create(_currentRace);
             RegisterRunners();
             CurrentState = State.InProgress;
+        }
+
+        /// <summary>
+        /// Assigns a time to the runner with the starter if possible
+        /// </summary>
+        /// <param name="starter">the starter number of the runner</param>
+        /// <param name="time">the time to assign to the runner</param>
+        /// <returns>if the assignment was successful</returns>
+        public bool TryAssignTimeToRunner(int starter, long time)
+        {
+            //Prevent assigning faulty times to runners
+            if (!_measurements.Contains(time))
+            {
+                return false;
+            }
+
+            _measurements.Remove(time);
+
+            //Make sure a runner with the starter exists
+            var runner = _runnerRepo.Get(r => r.Starter == starter).FirstOrDefault();
+            if (runner == null)
+            {
+                return false;
+            }
+
+            //Assign the time
+            runner.Time = time;
+            _runnerRepo.Update(runner);
+            RunnerFinished?.Invoke(runner);
+
+            //Every Runner has finished
+            if (CurrentRunners.All(r => r.Time != 0))
+            {
+                CurrentState = State.Ready;
+            }
+
+            return true;
         }
 
         /// <summary>

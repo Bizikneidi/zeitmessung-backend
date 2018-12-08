@@ -23,13 +23,13 @@ namespace TimeMeasurement_Backend
                 {
                     //Listen on 5000 with http
                     options.Listen(IPAddress.Any, 5000);
-                    try {
+                    try
+                    {
                         //Listen on 5001 with https
-                        options.Listen(IPAddress.Any, 5001, listenOptions =>
-                        {
-                            listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234");
-                        });
-                    } catch (Exception ex) {
+                        options.Listen(IPAddress.Any, 5001, listenOptions => { listenOptions.UseHttps("/root/certs/certificate.p12", "Admin1234"); });
+                    }
+                    catch (Exception ex)
+                    {
                         Console.WriteLine(ex);
                     }
                 })

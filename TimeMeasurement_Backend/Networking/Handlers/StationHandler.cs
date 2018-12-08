@@ -1,9 +1,9 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using TimeMeasurement_Backend.Logic;
-using TimeMeasurement_Backend.Networking.Messaging;
+using TimeMeasurement_Backend.Networking.MessageData;
 
-namespace TimeMeasurement_Backend.Networking
+namespace TimeMeasurement_Backend.Networking.Handlers
 {
     /// <summary>
     /// Handles a websocket connection with a station

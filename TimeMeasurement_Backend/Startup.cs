@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TimeMeasurement_Backend.Networking;
+using TimeMeasurement_Backend.Networking.Handlers;
 using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend

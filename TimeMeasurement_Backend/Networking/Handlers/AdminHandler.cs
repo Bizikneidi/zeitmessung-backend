@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Logic;
-using TimeMeasurement_Backend.Networking.Messaging;
+using TimeMeasurement_Backend.Networking.MessageData;
 
-namespace TimeMeasurement_Backend.Networking
+namespace TimeMeasurement_Backend.Networking.Handlers
 {
     /// <summary>
     /// Handles a websocket connection with an admin
@@ -38,70 +38,6 @@ namespace TimeMeasurement_Backend.Networking
             _admin = admin;
             SendCurrentState();
             await ListenAsync(_admin);
-        }
-
-        /// <summary>
-        /// Sends a measurement to the admin to assign to a start number
-        /// </summary>
-        /// <param name="time">the measured time in ms</param>
-        private void SendMeasuredStop(long time)
-        {
-            var message = new Message<AdminCommands>
-            {
-                Command = AdminCommands.MeasuredStop,
-                Data = time
-            };
-            SendMessage(_admin, message);
-        }
-
-        /// <summary>
-        /// Send the current race state to the admin
-        /// </summary>
-        private void SendCurrentState()
-        {
-            var toSend = new Message<AdminCommands>
-            {
-                Command = AdminCommands.State,
-                Data = RaceManager.Instance.CurrentState
-            };
-            SendMessage(_admin, toSend);
-        }
-
-        /// <summary>
-        /// Notify the admin that a race has ended
-        /// </summary>
-        private void SendRaceEnd()
-        {
-            var toSend = new Message<AdminCommands>
-            {
-                Command = AdminCommands.RaceEnd,
-                Data = null
-            };
-            SendMessage(_admin, toSend);
-        }
-
-        /// <summary>
-        /// Notify the admin that a race has started
-        /// </summary>
-        private void SendRaceStart()
-        {
-            var message = new Message<AdminCommands>
-            {
-                Command = AdminCommands.RaceStart,
-                Data = new RaceStartDTO
-                {
-                    StartTime = RaceManager.Instance.TimeMeter.StartTime,
-                    CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Runners = RaceManager.Instance.CurrentRunners
-                }
-            };
-            SendMessage(_admin, message);
-
-            //Also send all not yet assigned times
-            foreach (long measurement in RaceManager.Instance.UnassignedMeasurements)
-            {
-                SendMeasuredStop(measurement);
-            }
         }
 
         protected override void HandleMessage(WebSocket sender, Message<AdminCommands> received)
@@ -143,6 +79,70 @@ namespace TimeMeasurement_Backend.Networking
             if (prev == RaceManager.State.InProgress)
             {
                 SendRaceEnd();
+            }
+        }
+
+        /// <summary>
+        /// Send the current race state to the admin
+        /// </summary>
+        private void SendCurrentState()
+        {
+            var toSend = new Message<AdminCommands>
+            {
+                Command = AdminCommands.State,
+                Data = RaceManager.Instance.CurrentState
+            };
+            SendMessage(_admin, toSend);
+        }
+
+        /// <summary>
+        /// Sends a measurement to the admin to assign to a start number
+        /// </summary>
+        /// <param name="time">the measured time in ms</param>
+        private void SendMeasuredStop(long time)
+        {
+            var message = new Message<AdminCommands>
+            {
+                Command = AdminCommands.MeasuredStop,
+                Data = time
+            };
+            SendMessage(_admin, message);
+        }
+
+        /// <summary>
+        /// Notify the admin that a race has ended
+        /// </summary>
+        private void SendRaceEnd()
+        {
+            var toSend = new Message<AdminCommands>
+            {
+                Command = AdminCommands.RaceEnd,
+                Data = null
+            };
+            SendMessage(_admin, toSend);
+        }
+
+        /// <summary>
+        /// Notify the admin that a race has started
+        /// </summary>
+        private void SendRaceStart()
+        {
+            var message = new Message<AdminCommands>
+            {
+                Command = AdminCommands.RaceStart,
+                Data = new RaceStartDTO
+                {
+                    StartTime = RaceManager.Instance.TimeMeter.StartTime,
+                    CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
+                    Runners = RaceManager.Instance.CurrentRunners
+                }
+            };
+            SendMessage(_admin, message);
+
+            //Also send all not yet assigned times
+            foreach (long measurement in RaceManager.Instance.UnassignedMeasurements)
+            {
+                SendMeasuredStop(measurement);
             }
         }
     }

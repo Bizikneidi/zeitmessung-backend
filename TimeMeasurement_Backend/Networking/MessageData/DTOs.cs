@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TimeMeasurement_Backend.Entities;
 
-namespace TimeMeasurement_Backend.Networking.Messaging
+namespace TimeMeasurement_Backend.Networking.MessageData
 {
     /// <summary>
     /// Used to transfer basic data about the current race

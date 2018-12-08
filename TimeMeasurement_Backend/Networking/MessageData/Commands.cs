@@ -1,4 +1,4 @@
-﻿namespace TimeMeasurement_Backend.Networking.Messaging
+﻿namespace TimeMeasurement_Backend.Networking.MessageData
 {
     public enum StationCommands
     {
@@ -35,7 +35,7 @@
         Runners = 6, //Message contains all runners for a race
 
         //VIEWER -> SERVER
-        GetRunners = 7 //Viewer is requesting all racers to a race. Message contains the race id
+        GetRunners = 7 //Viewer is requesting all runners to a race. Message contains the race id
     }
 
     public enum ParticipantCommands
