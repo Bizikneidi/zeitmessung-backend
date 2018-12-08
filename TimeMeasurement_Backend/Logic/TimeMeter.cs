@@ -3,12 +3,12 @@
 namespace TimeMeasurement_Backend.Logic
 {
     /// <summary>
-    /// A class to record a single time measurement
+    /// Allows keeping track of the time and measure times
     /// </summary>
     public class TimeMeter
     {
         /// <summary>
-        /// The internal time of the machine, at the time of StartMeasurements(starttime)
+        /// The internal time of the server, at the time of StartMeasurements(starttime)
         /// </summary>
         private long _serverStartTime;
 
@@ -20,8 +20,8 @@ namespace TimeMeasurement_Backend.Logic
         {
             get
             {
-                long diff = _serverStartTime - StartTime;
-                return DateTimeOffset.Now.ToUnixTimeMilliseconds() - diff;
+                long diff = _serverStartTime - StartTime; //Diff between server time and station time
+                return DateTimeOffset.Now.ToUnixTimeMilliseconds() - diff; //Time passed since the start
             }
         }
 
@@ -36,9 +36,9 @@ namespace TimeMeasurement_Backend.Logic
         public event Action<long> OnMeasurement;
 
         /// <summary>
-        /// State a measurement
+        /// Start a measurement
         /// </summary>
-        /// <param name="startTime">the start time of the measurement</param>
+        /// <param name="startTime">the station start time of the measurement</param>
         public void StartMeasurements(long startTime)
         {
             //store current system time and station time
