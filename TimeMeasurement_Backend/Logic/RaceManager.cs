@@ -174,7 +174,7 @@ namespace TimeMeasurement_Backend.Logic
             _measurements.Remove(time);
 
             //Make sure a runner with the starter exists
-            var runner = _runnerRepo.Get(r => r.Starter == starter && r.RaceId == _currentRace.Id).FirstOrDefault();
+            var runner = _runnerRepo.Get(r => r.Starter == starter && r.Race.Id == _currentRace.Id, r => r.Race).FirstOrDefault();
             if (runner == null)
             {
                 return false;
