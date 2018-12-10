@@ -189,6 +189,7 @@ namespace TimeMeasurement_Backend.Logic
             if (CurrentRunners.All(r => r.Time != 0))
             {
                 CurrentState = State.Ready;
+                _currentRace = null;
             }
 
             return true;
