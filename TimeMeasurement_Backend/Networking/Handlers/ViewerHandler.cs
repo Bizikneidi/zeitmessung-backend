@@ -84,6 +84,19 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         }
 
         /// <summary>
+        /// Broadcasts all races
+        /// </summary>
+        private void BroadcastRaces()
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Races,
+                Data = RaceManager.Instance.Races
+            };
+            BroadcastMessage(_viewers, toSend);
+        }
+
+        /// <summary>
         /// Broadcasts the start of a race
         /// </summary>
         private void BroadcastRaceStart()
@@ -131,6 +144,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             if (prev == RaceManager.State.InProgress)
             {
                 BroadcastRaceEnd();
+                BroadcastRaces();
             }
         }
 
