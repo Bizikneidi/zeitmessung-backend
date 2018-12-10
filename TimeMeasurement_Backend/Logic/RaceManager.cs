@@ -188,8 +188,8 @@ namespace TimeMeasurement_Backend.Logic
             //Every Runner has finished
             if (CurrentRunners.All(r => r.Time != 0))
             {
-                CurrentState = State.Ready;
                 _currentRace = null;
+                CurrentState = State.Ready;
             }
 
             return true;
