@@ -37,6 +37,11 @@ namespace TimeMeasurement_Backend.Networking.Handlers
 
             _admin = admin;
             SendCurrentState();
+            if (RaceManager.Instance.CurrentState == RaceManager.State.InProgress)
+            {
+                SendRaceStart();
+            }
+
             await ListenAsync(_admin);
         }
 
