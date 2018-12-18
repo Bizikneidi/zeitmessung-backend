@@ -15,35 +15,37 @@
     {
         //SERVER -> ADMIN
         State = 0, //The state of the current race. Message contains the current race state
-        RaceStart = 1, //A race has started. Message contains the start time and all runners
-        MeasuredStop = 2, //A runner has finished. Message contains the corresponding stop time
-        RaceEnd = 3, //The race has ended (data is null)
+        AvailableRaces = 1, //All available races the admin can start (data is a list of races)
+        RaceStart = 2, //A race has started. Message contains the start time and all participants
+        MeasuredStop = 3, //A participant has finished. Message contains the corresponding stop time
+        RaceEnd = 4, //The race has ended (data is null)
 
         //ADMIN -> SERVER
-        Start = 4, //Admin has pressed the start button and server should start a race (data is null)
-        AssignTime = 5 //Admin assigned a time to a runner. Message contains am AssignmentDTO
+        Start = 5, //Admin has pressed the start button and server should start a race (data is the id of a race)
+        AssignTime = 6, //Admin assigned a time to a participant. Message contains am AssignmentDTO
+        CreateRace = 7 //Admin created a race. (data is a race)
     }
 
     public enum ViewerCommands
     {
         //SERVER -> VIEWER
         State = 0, //The state of the current race. Message contains the current race state
-        RaceStart = 1, //A race has started. Message contains the start time and all runners
-        RunnerFinished = 2, //A runner has finished. Message contains a runner who finished the race
+        RaceStart = 1, //A race has started. Message contains the start time and all participants
+        ParticipantFinished = 2, //A participant has finished. Message contains a participant who finished the race
         RaceEnd = 4, //The race has ended (data is null)
         Races = 5, //Message contains all races up to this point
-        Runners = 6, //Message contains all runners for a race
+        Participants = 6, //Message contains all participants for a race
 
         //VIEWER -> SERVER
-        GetRunners = 7 //Viewer is requesting all runners to a race. Message contains the race id
+        GetParticipants = 7 //Viewer is requesting all participants to a race. Message contains the race id
     }
 
     public enum ParticipantCommands
     {
         //SERVER -> PARTICIPANT
-        //nothing here yet...
+        Races = 0, //A list of all races of the future, the participant can register for (data is list of races)
 
         //PARTICIPANT -> SERVER
-        Register = 0 //A person wants to register. Message contains data to register as a participant
+        Register = 1 //A person wants to register. Message contains data to register as a participant
     }
 }

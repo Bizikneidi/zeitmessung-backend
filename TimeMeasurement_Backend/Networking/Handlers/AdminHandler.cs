@@ -1,6 +1,9 @@
-﻿using System.Net.WebSockets;
+﻿using System;
+using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.MessageData;
 
@@ -37,6 +40,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
 
             _admin = admin;
             SendCurrentState();
+            SendAvailableRaces();
             if (RaceManager.Instance.CurrentState == RaceManager.State.InProgress)
             {
                 SendRaceStart();
@@ -51,7 +55,12 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             {
                 //Admin has pressed start
                 case AdminCommands.Start:
-                    RaceManager.Instance.RequestStart();
+                    RaceManager.Instance.RequestStart((int)received.Data);
+                    break;
+                //Admin has created a race
+                case AdminCommands.CreateRace:
+                    var race = ((JObject)received.Data).ToObject<Race>();
+                    RaceManager.Instance.CreateRace(race);
                     break;
                 //Admin has assigned a time to a runner
                 case AdminCommands.AssignTime:
@@ -81,10 +90,28 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 SendRaceStart();
             }
 
-            if (prev == RaceManager.State.InProgress)
+            if (prev != RaceManager.State.InProgress)
             {
-                SendRaceEnd();
+                return;
             }
+
+            SendRaceEnd();
+            SendAvailableRaces();
+        }
+
+        /// <summary>
+        /// Send all races the admin could start at the moment
+        /// </summary>
+        private void SendAvailableRaces()
+        {
+            long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            long twelveHours = 12 * 60 * 60 * 1000;
+            var message = new Message<AdminCommands>
+            {
+                Command = AdminCommands.AvailableRaces,
+                Data = RaceManager.Instance.Races.Where(r => r.Date >= now - twelveHours && r.Date <= now - twelveHours)
+            };
+            SendMessage(_admin, message);
         }
 
         /// <summary>
@@ -139,7 +166,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 {
                     StartTime = RaceManager.Instance.TimeMeter.StartTime,
                     CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Runners = RaceManager.Instance.CurrentRunners
+                    Participants = RaceManager.Instance.CurrentParticipants
                 }
             };
             SendMessage(_admin, message);

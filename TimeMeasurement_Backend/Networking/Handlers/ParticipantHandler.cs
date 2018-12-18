@@ -1,7 +1,10 @@
-﻿using System.Net.WebSockets;
+﻿using System;
+using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Entities;
+using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.MessageData;
 using TimeMeasurement_Backend.Persistence;
 
@@ -26,6 +29,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <returns></returns>
         public async Task AddPotentialParticipant(WebSocket participant)
         {
+            SendRaces(participant);
             await ListenAsync(participant);
         }
 
@@ -44,6 +48,21 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         protected override void OnDisconnect(WebSocket disconnected)
         {
             //Nothing to clean up here!
+        }
+
+        /// <summary>
+        /// Sends the list of races of the furutre to a participant
+        /// </summary>
+        /// <param name="participant">The Websocket corresponding to a potential participant</param>
+        private void SendRaces(WebSocket participant)
+        {
+            long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            var message = new Message<ParticipantCommands>
+            {
+                Command = ParticipantCommands.Races,
+                Data = RaceManager.Instance.Races.Where(r => r.Date > now)
+            };
+            SendMessage(participant, message);
         }
     }
 }

@@ -89,12 +89,22 @@ namespace TimeMeasurement_Backend.Entities
         public string PostalCode { get; set; }
 
         /// <summary>
+        /// The Race the Participant registered for
+        /// </summary>
+        public Race Race { get; set; }
+
+        /// <summary>
         /// only m (male) f (female) or o (other)
         /// required
         /// </summary>
         [Required]
         [RegularExpression(@"^[mfo]$")]
         public string Sex { get; set; }
+
+        /// <summary>
+        /// The starter number of the participant
+        /// </summary>
+        public int Starter { get; set; }
 
         /// <summary>
         /// Letters
@@ -105,9 +115,14 @@ namespace TimeMeasurement_Backend.Entities
         public string Street { get; set; }
 
         /// <summary>
-        /// Could be anything
+        /// The team could be anything
         /// </summary>
         public string Team { get; set; }
+
+        /// <summary>
+        /// The time it took him to complete the race (in ms)
+        /// </summary>
+        public long Time { get; set; }
 
         /// <summary>
         /// first year group: 1920
