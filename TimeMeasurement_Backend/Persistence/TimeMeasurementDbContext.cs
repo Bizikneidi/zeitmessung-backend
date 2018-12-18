@@ -18,11 +18,6 @@ namespace TimeMeasurement_Backend.Persistence
         /// </summary>
         public DbSet<Race> Races { get; set; }
 
-        /// <summary>
-        /// table which stores every runner entity
-        /// </summary>
-        public DbSet<Runner> Runners { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Set SQL Server Path

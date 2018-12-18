@@ -22,7 +22,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             _viewers = new List<WebSocket>();
 
             RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
-            RaceManager.Instance.RunnerFinished += BroadcastRunnerFinished;
+            RaceManager.Instance.ParticipantFinished += BroadcastParticipantFinished;
         }
 
         /// <summary>
@@ -45,9 +45,9 @@ namespace TimeMeasurement_Backend.Networking.Handlers
 
         protected override void HandleMessage(WebSocket sender, Message<ViewerCommands> received)
         {
-            if (received.Command == ViewerCommands.GetRunners)
+            if (received.Command == ViewerCommands.GetParticipants)
             {
-                SendRunnersTo(sender, (int)(long)received.Data);
+                SendParticipantsTo(sender, (int)(long)received.Data);
             }
         }
 
@@ -66,6 +66,24 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             {
                 Command = ViewerCommands.State,
                 Data = RaceManager.Instance.CurrentState
+            };
+            BroadcastMessage(_viewers, toSend);
+        }
+
+        /// <summary>
+        /// Broadcasts that a runner has finished the race
+        /// </summary>
+        /// <param name="participant">the runner who finished the race</param>
+        private void BroadcastParticipantFinished(Participant participant)
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.ParticipantFinished,
+                Data = new AssignmentDTO
+                {
+                    Time = participant.Time,
+                    Starter = participant.Starter
+                }
             };
             BroadcastMessage(_viewers, toSend);
         }
@@ -108,28 +126,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 {
                     StartTime = RaceManager.Instance.TimeMeter.StartTime,
                     CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Runners = RaceManager.Instance.CurrentRunners
+                    Participants = RaceManager.Instance.CurrentParticipants
                 }
             };
             BroadcastMessage(_viewers, message);
-        }
-
-        /// <summary>
-        /// Broadcasts that a runner has finished the race
-        /// </summary>
-        /// <param name="runner">the runner who finished the race</param>
-        private void BroadcastRunnerFinished(Runner runner)
-        {
-            var toSend = new Message<ViewerCommands>
-            {
-                Command = ViewerCommands.RunnerFinished,
-                Data = new AssignmentDTO
-                {
-                    Time = runner.Time,
-                    Starter = runner.Starter
-                }
-            };
-            BroadcastMessage(_viewers, toSend);
         }
 
         private void OnRaceManagerStateChanged(RaceManager.State prev, RaceManager.State current)
@@ -163,6 +163,21 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         }
 
         /// <summary>
+        /// Send all participants for a race to a viewer
+        /// </summary>
+        /// <param name="receiver">the viewer who requested the participants</param>
+        /// <param name="raceId">the id of the race</param>
+        private void SendParticipantsTo(WebSocket receiver, int raceId)
+        {
+            var toSend = new Message<ViewerCommands>
+            {
+                Command = ViewerCommands.Participants,
+                Data = RaceManager.Instance.GetParticipants(raceId)
+            };
+            SendMessage(receiver, toSend);
+        }
+
+        /// <summary>
         /// Send current race start data to a viewer
         /// </summary>
         /// <param name="receiver">the viewer to send them to</param>
@@ -175,7 +190,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 {
                     StartTime = RaceManager.Instance.TimeMeter.StartTime,
                     CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Runners = RaceManager.Instance.CurrentRunners
+                    Participants = RaceManager.Instance.CurrentParticipants
                 }
             };
             SendMessage(receiver, message);
@@ -191,21 +206,6 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             {
                 Command = ViewerCommands.Races,
                 Data = RaceManager.Instance.Races
-            };
-            SendMessage(receiver, toSend);
-        }
-
-        /// <summary>
-        /// Send all runners for a race to a viewer
-        /// </summary>
-        /// <param name="receiver">the viewer who requested the runners</param>
-        /// <param name="raceId">the id of the race</param>
-        private void SendRunnersTo(WebSocket receiver, int raceId)
-        {
-            var toSend = new Message<ViewerCommands>
-            {
-                Command = ViewerCommands.Runners,
-                Data = RaceManager.Instance.GetRunners(raceId)
             };
             SendMessage(receiver, toSend);
         }
