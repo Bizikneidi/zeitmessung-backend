@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TimeMeasurement_Backend.Entities;
-using Newtonsoft.Json;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +9,7 @@ namespace TimeMeasurement_Backend.Persistence
     /// <summary>
     /// A Generic Repository to do CRUD operations on the DB
     /// </summary>
-    /// <typeparam name="T">The Class to work with</typeparam>
+    /// <typeparam name="T">The Entity type to work with</typeparam>
     public class TimeMeasurementRepository<T> where T : class
     {
         /// <summary>
@@ -22,10 +20,10 @@ namespace TimeMeasurement_Backend.Persistence
         {
             using (var db = new TimeMeasurementDbContext())
             {
+                db.Set<T>().Attach(item);
                 db.Set<T>().Add(item);
                 db.SaveChanges();
             }
-	    throw new System.ArgumentException("added: " + JsonConvert.SerializeObject(item));
         }
 
         /// <summary>
@@ -46,12 +44,19 @@ namespace TimeMeasurement_Backend.Persistence
         /// Get Objects from the DB
         /// </summary>
         /// <param name="predicate">The WHERE clause</param>
-        /// <returns></returns>
-        public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null)
+        /// <param name="includes">Objects to include</param>
+        /// <returns>All entites matching the WHERE clause and the data requested in includes</returns>
+        public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null, params Expression<Func<T, object>>[] includes)
         {
             using (var db = new TimeMeasurementDbContext())
             {
-                var query = db.Set<T>();
+                var query = (IQueryable<T>)db.Set<T>();
+                // ReSharper disable once InvertIf
+                if (includes != null)
+                {
+                    query = includes.Aggregate(query, (current, include) => current.Include(include));
+                }
+
                 return predicate == null ? query.ToList() : query.Where(predicate).ToList();
             }
         }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git pull;
-killall -9 dotnet;
-dotnet build;
-dotnet run --project TimeMeasurement_Backend
+sudo git pull;
+sudo killall -9 dotnet;
+sudo dotnet build;
+sudo dotnet run --project TimeMeasurement_Backend

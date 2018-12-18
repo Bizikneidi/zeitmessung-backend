@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Entities;
-using TimeMeasurement_Backend.Networking.Messaging;
+using TimeMeasurement_Backend.Networking.MessageData;
 using TimeMeasurement_Backend.Persistence;
 
-namespace TimeMeasurement_Backend.Networking
+namespace TimeMeasurement_Backend.Networking.Handlers
 {
     /// <summary>
-    /// Handles websocket connection with an admin
+    /// Handles a websocket connection with a potential participant
     /// </summary>
     public class ParticipantHandler : Handler<ParticipantCommands>
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TimeMeasurement_Backend.Networking;
+using TimeMeasurement_Backend.Networking.Handlers;
 using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend
@@ -32,16 +32,15 @@ namespace TimeMeasurement_Backend
             var adminHandler = new AdminHandler();
             var stationHandler = new StationHandler();
             var viewerHandler = new ViewerHandler();
-
             var participantHandler = new ParticipantHandler();
 
             //app.UseHttpsRedirection();
             //app.UseHsts();
             app.UseWebSockets();
+
             //Register Custom Connection Handling
             app.Use(async (context, next) =>
             {
-
                 //Get request path
                 var path = context.Request.Path.Value.Split('/');
                 //Check if request is WS and path requestPath has value
@@ -70,7 +69,7 @@ namespace TimeMeasurement_Backend
                 }
                 else
                 {
-                    //Pass to next handler (registered by ASP)
+                    //Pass to next handler (registered by the runtime)
                     await next.Invoke();
                 }
             });
@@ -82,11 +81,7 @@ namespace TimeMeasurement_Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 5001;
-            });
+            services.AddHttpsRedirection(options => { options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect; });
         }
     }
 }

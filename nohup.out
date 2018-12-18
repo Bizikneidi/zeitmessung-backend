@@ -1,0 +1,76 @@
+Already up to date.
+dotnet: no process found
+Microsoft (R)-Build-Engine, Version 15.8.169+g1ccb72aefa für .NET Core
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+  Wiederherstellung in "82,65 ms" für "/zeitmessung-backend/TimeMeasurement_Backend/TimeMeasurement_Backend.csproj" abgeschlossen.
+  TimeMeasurement_Backend -> /zeitmessung-backend/TimeMeasurement_Backend/bin/Debug/netcoreapp2.1/TimeMeasurement_Backend.dll
+
+Der Buildvorgang wurde erfolgreich ausgeführt.
+    0 Warnung(en)
+    0 Fehler
+
+Verstrichene Zeit 00:00:03.41
+Die Starteinstellungen von TimeMeasurement_Backend/Properties/launchSettings.json werden verwendet…
+Hosting environment: Development
+Content root path: /zeitmessung-backend/TimeMeasurement_Backend
+Now listening on: http://172.18.2.16:5000
+Now listening on: http://172.18.2.16:5001
+Application started. Press Ctrl+C to shut down.
+[41m[30mfail[39m[22m[49m: Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware[1]
+      An unhandled exception has occurred while executing the request.
+System.Net.WebSockets.WebSocketException (0x80004005): The remote party closed the WebSocket connection without completing the close handshake. ---> Microsoft.AspNetCore.Connections.ConnectionResetException: Connection reset by peer ---> System.Net.Sockets.SocketException: Connection reset by peer
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal.SocketAwaitable.GetResult()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal.SocketConnection.ProcessReceives()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal.SocketConnection.DoReceive()
+   --- End of inner exception stack trace ---
+   at System.IO.Pipelines.PipeCompletion.ThrowLatchedException()
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at System.IO.Pipelines.Pipe.DefaultPipeReader.GetResult(Int16 token)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1MessageBody.PumpAsync()
+   at System.IO.Pipelines.PipeCompletion.ThrowLatchedException()
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at System.IO.Pipelines.Pipe.DefaultPipeReader.GetResult(Int16 token)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.MessageBody.ReadAsync(Memory`1 buffer, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpRequestStream.ReadAsyncInternal(Memory`1 buffer, CancellationToken cancellationToken)
+   at System.Net.WebSockets.ManagedWebSocket.EnsureBufferContainsAsync(Int32 minimumRequiredBytes, Boolean throwOnPrematureClosure)
+   at System.Net.WebSockets.ManagedWebSocket.ReceiveAsyncPrivate[TWebSocketReceiveResultGetter,TWebSocketReceiveResult](Memory`1 payloadBuffer, CancellationToken cancellationToken, TWebSocketReceiveResultGetter resultGetter)
+   at System.Net.WebSockets.ManagedWebSocket.ReceiveAsyncPrivate[TWebSocketReceiveResultGetter,TWebSocketReceiveResult](Memory`1 payloadBuffer, CancellationToken cancellationToken, TWebSocketReceiveResultGetter resultGetter)
+   at TimeMeasurement_Backend.Networking.Handler`1.ListenAsync(WebSocket ws) in /zeitmessung-backend/TimeMeasurement_Backend/Networking/Handler.cs:line 66
+   at TimeMeasurement_Backend.Networking.StationHandler.SetStationAsync(WebSocket ws) in /zeitmessung-backend/TimeMeasurement_Backend/Networking/StationHandler.cs:line 35
+   at TimeMeasurement_Backend.Startup.<>c__DisplayClass4_0.<<Configure>b__0>d.MoveNext() in /zeitmessung-backend/TimeMeasurement_Backend/Startup.cs:line 61
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+[40m[1m[33mwarn[39m[22m[49m: Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware[2]
+      The response has already started, the error page middleware will not be executed.
+[41m[30mfail[39m[22m[49m: Microsoft.AspNetCore.Server.Kestrel[13]
+      Connection id "0HLHONDOLQNO7", Request id "0HLHONDOLQNO7:00000001": An unhandled exception was thrown by the application.
+System.Net.WebSockets.WebSocketException (0x80004005): The remote party closed the WebSocket connection without completing the close handshake. ---> Microsoft.AspNetCore.Connections.ConnectionResetException: Connection reset by peer ---> System.Net.Sockets.SocketException: Connection reset by peer
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal.SocketAwaitable.GetResult()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal.SocketConnection.ProcessReceives()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal.SocketConnection.DoReceive()
+   --- End of inner exception stack trace ---
+   at System.IO.Pipelines.PipeCompletion.ThrowLatchedException()
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at System.IO.Pipelines.Pipe.DefaultPipeReader.GetResult(Int16 token)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1MessageBody.PumpAsync()
+   at System.IO.Pipelines.PipeCompletion.ThrowLatchedException()
+   at System.IO.Pipelines.Pipe.GetReadResult(ReadResult& result)
+   at System.IO.Pipelines.Pipe.GetReadAsyncResult()
+   at System.IO.Pipelines.Pipe.DefaultPipeReader.GetResult(Int16 token)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.MessageBody.ReadAsync(Memory`1 buffer, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpRequestStream.ReadAsyncInternal(Memory`1 buffer, CancellationToken cancellationToken)
+   at System.Net.WebSockets.ManagedWebSocket.EnsureBufferContainsAsync(Int32 minimumRequiredBytes, Boolean throwOnPrematureClosure)
+   at System.Net.WebSockets.ManagedWebSocket.ReceiveAsyncPrivate[TWebSocketReceiveResultGetter,TWebSocketReceiveResult](Memory`1 payloadBuffer, CancellationToken cancellationToken, TWebSocketReceiveResultGetter resultGetter)
+   at System.Net.WebSockets.ManagedWebSocket.ReceiveAsyncPrivate[TWebSocketReceiveResultGetter,TWebSocketReceiveResult](Memory`1 payloadBuffer, CancellationToken cancellationToken, TWebSocketReceiveResultGetter resultGetter)
+   at TimeMeasurement_Backend.Networking.Handler`1.ListenAsync(WebSocket ws) in /zeitmessung-backend/TimeMeasurement_Backend/Networking/Handler.cs:line 66
+   at TimeMeasurement_Backend.Networking.StationHandler.SetStationAsync(WebSocket ws) in /zeitmessung-backend/TimeMeasurement_Backend/Networking/StationHandler.cs:line 35
+   at TimeMeasurement_Backend.Startup.<>c__DisplayClass4_0.<<Configure>b__0>d.MoveNext() in /zeitmessung-backend/TimeMeasurement_Backend/Startup.cs:line 61
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+Application is shutting down...
