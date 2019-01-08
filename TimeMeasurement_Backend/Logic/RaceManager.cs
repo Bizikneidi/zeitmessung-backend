@@ -7,7 +7,7 @@ using TimeMeasurement_Backend.Persistence;
 namespace TimeMeasurement_Backend.Logic
 {
     /// <summary>
-    /// Allows for a race state management, fires events when runners finish, a race ends, ...
+    /// Allows for a race state management, fires events when participants finish, a race ends, ...
     /// </summary>
     public class RaceManager
     {
@@ -22,7 +22,7 @@ namespace TimeMeasurement_Backend.Logic
             Disabled //The racemanager is not ready and nobody can request or start a race
         }
 
-        //all not assigned measurements
+        //all not yet assigned measurements
         private readonly List<long> _measurements;
 
         //Repos for database access
@@ -33,11 +33,6 @@ namespace TimeMeasurement_Backend.Logic
         /// The current race, which is being managed
         /// </summary>
         private Race _currentRace;
-
-        /// <summary>
-        /// The id of the currently requested race, if valid
-        /// </summary>
-        private int _currentRaceId;
 
         /// <summary>
         /// The state of the current race
@@ -66,9 +61,42 @@ namespace TimeMeasurement_Backend.Logic
         public static RaceManager Instance { get; } = new RaceManager();
 
         /// <summary>
-        /// All races that were ever monitored except the current one
+        /// All races of the future
         /// </summary>
-        public IEnumerable<Race> Races => _currentRace == null ? _raceRepo.Get() : _raceRepo.Get(r => r.Id != _currentRace.Id);
+        public IEnumerable<Race> FutureRaces
+        {
+            get
+            {
+                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                return _raceRepo.Get(r => r.Id != _currentRace.Id && r.Done == false && r.Date > now);
+            }
+        }
+
+
+        /// <summary>
+        /// All races that can be started at the moment
+        /// </summary>
+        public IEnumerable<Race> StartableRaces
+        {
+            get
+            {
+                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                long twelveHours = 12 * 60 * 60 * 1000;
+                return _raceRepo.Get(r => r.Id != _currentRace.Id && r.Done == false && r.Date >= now - twelveHours && r.Date <= now + twelveHours);
+            }
+        }
+
+        /// <summary>
+        /// All races of the past
+        /// </summary>
+        public IEnumerable<Race> PastRaces
+        {
+            get
+            {
+                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                return _raceRepo.Get(r => r.Id != _currentRace.Id && r.Done && r.Date < now);
+            }
+        }
 
         /// <summary>
         /// Keeps track of the time
@@ -108,6 +136,11 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="toCreate">The race to create</param>
         public void CreateRace(Race toCreate)
         {
+            if (toCreate == null)
+            {
+                return;
+            }
+
             _raceRepo.Create(toCreate);
         }
 
@@ -151,8 +184,19 @@ namespace TimeMeasurement_Backend.Logic
                 return;
             }
 
+            _currentRace = _raceRepo.Get(r => r.Id == raceId).FirstOrDefault();
+            if (_currentRace == null)
+            {
+                return;
+            }
+
+            //Only allow start of races that can be started today
+            if (StartableRaces.All(r => r.Id != raceId))
+            {
+                return;
+            }
+
             CurrentState = State.StartRequested;
-            _currentRaceId = raceId;
         }
 
         /// <summary>
@@ -166,7 +210,6 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             _measurements.Clear();
-            _currentRace = _raceRepo.Get(r => r.Id == _currentRaceId).FirstOrDefault();
             CurrentState = State.InProgress;
         }
 
@@ -197,7 +240,7 @@ namespace TimeMeasurement_Backend.Logic
             _participantRepo.Update(participant);
             ParticipantFinished?.Invoke(participant);
 
-            //Every Runner has finished
+            //Every participant has finished
             // ReSharper disable once InvertIf
             if (CurrentParticipants.All(r => r.Time != 0))
             {

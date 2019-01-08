@@ -47,7 +47,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         {
             if (received.Command == ViewerCommands.GetParticipants)
             {
-                SendParticipantsTo(sender, (int)(long)received.Data);
+                if (received.Data is long raceId)
+                {
+                    SendParticipantsTo(sender, (int)raceId);
+                }
             }
         }
 
@@ -109,7 +112,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Races,
-                Data = RaceManager.Instance.Races
+                Data = RaceManager.Instance.PastRaces
             };
             BroadcastMessage(_viewers, toSend);
         }
@@ -205,7 +208,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Races,
-                Data = RaceManager.Instance.Races
+                Data = RaceManager.Instance.PastRaces
             };
             SendMessage(receiver, toSend);
         }

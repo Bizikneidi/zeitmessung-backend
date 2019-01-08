@@ -52,6 +52,11 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="endTime">the stop time of the measurement</param>
         public void StopMeasurement(long endTime)
         {
+            if (endTime <= StartTime)
+            {
+                return;
+            }
+
             OnMeasurement?.Invoke(endTime - StartTime);
         }
     }
