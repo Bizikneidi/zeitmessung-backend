@@ -56,11 +56,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <param name="participant">The Websocket corresponding to a potential participant</param>
         private void SendRaces(WebSocket participant)
         {
-            long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             var message = new Message<ParticipantCommands>
             {
                 Command = ParticipantCommands.Races,
-                Data = RaceManager.Instance.Races.Where(r => r.Date > now)
+                Data = RaceManager.Instance.FutureRaces
             };
             SendMessage(participant, message);
         }

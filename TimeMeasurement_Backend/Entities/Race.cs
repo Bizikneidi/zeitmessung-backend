@@ -24,5 +24,10 @@ namespace TimeMeasurement_Backend.Entities
         /// The Title of the race
         /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// If this race has been started / completed in the past
+        /// </summary>
+        public bool Done { get; set; }
     }
 }

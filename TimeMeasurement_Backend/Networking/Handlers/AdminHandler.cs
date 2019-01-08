@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Entities;
@@ -55,7 +53,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             {
                 //Admin has pressed start
                 case AdminCommands.Start:
-                    RaceManager.Instance.RequestStart((int)received.Data);
+                    if (received.Data is int startTime) //Check if received data is valid
+                    {
+                        RaceManager.Instance.RequestStart(startTime);
+                    }
                     break;
                 //Admin has created a race
                 case AdminCommands.CreateRace:
@@ -104,12 +105,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// </summary>
         private void SendAvailableRaces()
         {
-            long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            long twelveHours = 12 * 60 * 60 * 1000;
             var message = new Message<AdminCommands>
             {
                 Command = AdminCommands.AvailableRaces,
-                Data = RaceManager.Instance.Races.Where(r => r.Date >= now - twelveHours && r.Date <= now - twelveHours)
+                Data = RaceManager.Instance.StartableRaces
             };
             SendMessage(_admin, message);
         }

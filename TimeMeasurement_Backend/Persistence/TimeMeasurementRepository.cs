@@ -18,12 +18,20 @@ namespace TimeMeasurement_Backend.Persistence
         /// <param name="item">object to insert</param>
         public void Create(T item)
         {
-            using (var db = new TimeMeasurementDbContext())
+            try
             {
-                db.Set<T>().Attach(item);
-                db.Set<T>().Add(item);
-                db.SaveChanges();
+                using (var db = new TimeMeasurementDbContext())
+                {
+                    db.Set<T>().Attach(item);
+                    db.Set<T>().Add(item);
+                    db.SaveChanges();
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
         }
 
         /// <summary>
@@ -32,11 +40,18 @@ namespace TimeMeasurement_Backend.Persistence
         /// <param name="item">object to delete</param>
         public void Delete(T item)
         {
-            using (var db = new TimeMeasurementDbContext())
+            try
             {
-                db.Set<T>().Attach(item);
-                db.Set<T>().Remove(item);
-                db.SaveChanges();
+                using (var db = new TimeMeasurementDbContext())
+                {
+                    db.Set<T>().Attach(item);
+                    db.Set<T>().Remove(item);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
@@ -48,16 +63,24 @@ namespace TimeMeasurement_Backend.Persistence
         /// <returns>All entites matching the WHERE clause and the data requested in includes</returns>
         public IEnumerable<T> Get(Expression<Func<T, bool>> predicate = null, params Expression<Func<T, object>>[] includes)
         {
-            using (var db = new TimeMeasurementDbContext())
+            try
             {
-                var query = (IQueryable<T>)db.Set<T>();
-                // ReSharper disable once InvertIf
-                if (includes != null)
+                using (var db = new TimeMeasurementDbContext())
                 {
-                    query = includes.Aggregate(query, (current, include) => current.Include(include));
-                }
+                    var query = (IQueryable<T>)db.Set<T>();
+                    // ReSharper disable once InvertIf
+                    if (includes != null)
+                    {
+                        query = includes.Aggregate(query, (current, include) => current.Include(include));
+                    }
 
-                return predicate == null ? query.ToList() : query.Where(predicate).ToList();
+                    return predicate == null ? query.ToList() : query.Where(predicate).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
             }
         }
 
@@ -67,11 +90,18 @@ namespace TimeMeasurement_Backend.Persistence
         /// <param name="item">object to update</param>
         public void Update(T item)
         {
-            using (var db = new TimeMeasurementDbContext())
+            try
             {
-                db.Set<T>().Attach(item);
-                db.Entry(item).State = EntityState.Modified;
-                db.SaveChanges();
+                using (var db = new TimeMeasurementDbContext())
+                {
+                    db.Set<T>().Attach(item);
+                    db.Entry(item).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }
