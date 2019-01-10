@@ -53,9 +53,9 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             {
                 //Admin has pressed start
                 case AdminCommands.Start:
-                    if (received.Data is int startTime) //Check if received data is valid
+                    if (received.Data is long raceId) //Check if received data is valid
                     {
-                        RaceManager.Instance.RequestStart(startTime);
+                        RaceManager.Instance.RequestStart((int)raceId);
                     }
                     break;
                 //Admin has created a race
