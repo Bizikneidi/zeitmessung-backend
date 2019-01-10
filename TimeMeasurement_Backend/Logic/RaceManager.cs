@@ -184,14 +184,14 @@ namespace TimeMeasurement_Backend.Logic
                 return;
             }
 
-            _currentRace = _raceRepo.Get(r => r.Id == raceId).FirstOrDefault();
-            if (_currentRace == null)
+            //Only allow start of races that can be started today
+            if (StartableRaces.All(r => r.Id != raceId))
             {
                 return;
             }
 
-            //Only allow start of races that can be started today
-            if (StartableRaces.All(r => r.Id != raceId))
+            _currentRace = _raceRepo.Get(r => r.Id == raceId).FirstOrDefault();
+            if (_currentRace == null)
             {
                 return;
             }
