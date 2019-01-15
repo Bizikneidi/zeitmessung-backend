@@ -22,9 +22,6 @@ namespace TimeMeasurement_Backend.Logic
             Disabled //The racemanager is not ready and nobody can request or start a race
         }
 
-        //all not yet assigned measurements
-        private readonly List<long> _measurements;
-
         //Repos for database access
         private readonly TimeMeasurementRepository<Race> _raceRepo;
 
@@ -92,23 +89,8 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
-        /// <summary>
-        /// Keeps track of the time
-        /// </summary>
-        public TimeMeter TimeMeter { get; }
-
-        /// <summary>
-        /// All recorded measurements which are not assigned to a participant yet
-        /// </summary>
-        public IEnumerable<long> UnassignedMeasurements => _measurements;
-
         private RaceManager()
         {
-            TimeMeter = new TimeMeter();
-            TimeMeter.OnMeasurement += measurement => _measurements.Add(measurement);
-
-            _measurements = new List<long>();
-
             _currentState = State.Disabled;
             _raceRepo = new TimeMeasurementRepository<Race>();
         }
@@ -187,7 +169,6 @@ namespace TimeMeasurement_Backend.Logic
                 return;
             }
 
-            _measurements.Clear();
             CurrentState = State.InProgress;
         }
     }
