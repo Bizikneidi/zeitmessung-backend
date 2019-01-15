@@ -22,7 +22,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             _viewers = new List<WebSocket>();
 
             RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
-            RaceManager.Instance.ParticipantFinished += BroadcastParticipantFinished;
+            ParticipantManager.Instance.ParticipantFinished += BroadcastParticipantFinished;
         }
 
         /// <summary>
@@ -127,9 +127,9 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 Command = ViewerCommands.RaceStart,
                 Data = new RaceStartDTO
                 {
-                    StartTime = RaceManager.Instance.TimeMeter.StartTime,
-                    CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Participants = RaceManager.Instance.CurrentParticipants
+                    StartTime = TimeMeter.Instance.StartTime,
+                    CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime,
+                    Participants = ParticipantManager.Instance.CurrentParticipants
                 }
             };
             BroadcastMessage(_viewers, message);
@@ -175,7 +175,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             var toSend = new Message<ViewerCommands>
             {
                 Command = ViewerCommands.Participants,
-                Data = RaceManager.Instance.GetParticipants(raceId)
+                Data = ParticipantManager.Instance.GetParticipants(raceId)
             };
             SendMessage(receiver, toSend);
         }
@@ -191,9 +191,9 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 Command = ViewerCommands.RaceStart,
                 Data = new RaceStartDTO
                 {
-                    StartTime = RaceManager.Instance.TimeMeter.StartTime,
-                    CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Participants = RaceManager.Instance.CurrentParticipants
+                    StartTime = TimeMeter.Instance.StartTime,
+                    CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime,
+                    Participants = ParticipantManager.Instance.CurrentParticipants
                 }
             };
             SendMessage(receiver, message);

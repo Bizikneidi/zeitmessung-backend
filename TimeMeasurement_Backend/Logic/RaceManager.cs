@@ -22,11 +22,7 @@ namespace TimeMeasurement_Backend.Logic
             Disabled //The racemanager is not ready and nobody can request or start a race
         }
 
-        //all not yet assigned measurements
-        private readonly List<long> _measurements;
-
         //Repos for database access
-        private readonly TimeMeasurementRepository<Participant> _participantRepo;
         private readonly TimeMeasurementRepository<Race> _raceRepo;
 
         /// <summary>
@@ -34,15 +30,12 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         private Race _currentRace;
 
+        public Race CurrentRace { get; set; }
+
         /// <summary>
         /// The state of the current race
         /// </summary>
         private State _currentState;
-
-        /// <summary>
-        /// All participants taking part in the current race
-        /// </summary>
-        public IEnumerable<Participant> CurrentParticipants => GetParticipants(_currentRace.Id);
 
         /// <summary>
         /// The current state of the time meter
@@ -50,7 +43,7 @@ namespace TimeMeasurement_Backend.Logic
         public State CurrentState
         {
             get => _currentState;
-            private set
+            set
             {
                 var prev = _currentState;
                 _currentState = value;
@@ -98,32 +91,11 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
-        /// <summary>
-        /// Keeps track of the time
-        /// </summary>
-        public TimeMeter TimeMeter { get; }
-
-        /// <summary>
-        /// All recorded measurements which are not assigned to a participant yet
-        /// </summary>
-        public IEnumerable<long> UnassignedMeasurements => _measurements;
-
         private RaceManager()
         {
-            TimeMeter = new TimeMeter();
-            TimeMeter.OnMeasurement += measurement => _measurements.Add(measurement);
-
-            _measurements = new List<long>();
-
             _currentState = State.Disabled;
-            _participantRepo = new TimeMeasurementRepository<Participant>();
             _raceRepo = new TimeMeasurementRepository<Race>();
         }
-
-        /// <summary>
-        /// Event to allow others to check, whenever a participant finishes the race
-        /// </summary>
-        public event Action<Participant> ParticipantFinished;
 
         /// <summary>
         /// Event to allow others to act accoring to the current state of the time meter
@@ -150,16 +122,6 @@ namespace TimeMeasurement_Backend.Logic
         public void Disable()
         {
             CurrentState = State.Disabled;
-        }
-
-        /// <summary>
-        /// Get all participants to a specific race
-        /// </summary>
-        /// <param name="raceId">the id of the race</param>
-        /// <returns>all participants who took part in the race</returns>
-        public IEnumerable<Participant> GetParticipants(int raceId)
-        {
-            return _participantRepo.Get(r => r.Race.Id == raceId, r => r.Race);
         }
 
         /// <summary>
@@ -209,46 +171,7 @@ namespace TimeMeasurement_Backend.Logic
                 return;
             }
 
-            _measurements.Clear();
             CurrentState = State.InProgress;
-        }
-
-        /// <summary>
-        /// Assigns a time to the participant with the starter if possible
-        /// </summary>
-        /// <param name="starter">the starter number of the participant</param>
-        /// <param name="time">the time to assign to the participant</param>
-        /// <returns>if the assignment was successful</returns>
-        public bool TryAssignTimeToRunner(int starter, long time)
-        {
-            //Prevent assigning faulty times to participants
-            if (!_measurements.Contains(time))
-            {
-                return false;
-            }
-
-            //Make sure a participant with the starter exists
-            var participant = _participantRepo.Get(r => r.Starter == starter && r.Race.Id == _currentRace.Id, r => r.Race).FirstOrDefault();
-            if (participant == null)
-            {
-                return false;
-            }
-
-            //Assign the time
-            _measurements.Remove(time);
-            participant.Time = time;
-            _participantRepo.Update(participant);
-            ParticipantFinished?.Invoke(participant);
-
-            //Every participant has finished
-            // ReSharper disable once InvertIf
-            if (CurrentParticipants.All(r => r.Time != 0))
-            {
-                _currentRace = null;
-                CurrentState = State.Ready;
-            }
-
-            return true;
         }
     }
 }

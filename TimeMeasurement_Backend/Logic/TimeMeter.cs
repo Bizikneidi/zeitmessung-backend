@@ -7,6 +7,9 @@ namespace TimeMeasurement_Backend.Logic
     /// </summary>
     public class TimeMeter
     {
+        private TimeMeter() { }
+        public static TimeMeter Instance { get; } = new TimeMeter();
+
         /// <summary>
         /// The internal time of the server, at the time of StartMeasurements(starttime)
         /// </summary>
