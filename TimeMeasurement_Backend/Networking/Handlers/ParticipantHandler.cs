@@ -16,11 +16,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
     public class ParticipantHandler : Handler<ParticipantCommands>
     {
         /// <summary>
-        /// Repository to store all new participants
+        /// Logic to manage Participants
         /// </summary>
-        private readonly TimeMeasurementRepository<Participant> _repo;
+        private ParticipantManager _participantManager = ParticipantManager.Instance;
 
-        public ParticipantHandler() => _repo = new TimeMeasurementRepository<Participant>();
 
         /// <summary>
         /// Connect with a potential participant and listen for his/her messages
@@ -40,9 +39,8 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 return;
             }
 
-            //Deserialize received Participant and store in DB
-            var participant = ((JObject)received.Data).ToObject<Participant>();
-            _repo.Create(participant);
+            //Deserialize received Participant, assign starter and store in DB
+            _participantManager.AddParticipant(((JObject)received.Data).ToObject<Participant>());
         }
 
         protected override void OnDisconnect(WebSocket disconnected)
