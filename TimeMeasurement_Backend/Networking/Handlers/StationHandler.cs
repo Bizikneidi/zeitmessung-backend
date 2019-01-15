@@ -42,14 +42,14 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 case StationCommands.MeasuredStart: //Station has played a tone and recorded the start time
                     if (received.Data is long startTime)
                     {
-                        RaceManager.Instance.TimeMeter.StartMeasurements(startTime);
+                        TimeMeter.Instance.StartMeasurements(startTime);
                         RaceManager.Instance.Start();
                     }
                     break;
                 case StationCommands.MeasuredStop: //Station has detected that someone finished and recorded the end time
                     if (received.Data is long endTime)
                     {
-                        RaceManager.Instance.TimeMeter.StopMeasurement(endTime);
+                        TimeMeter.Instance.StopMeasurement(endTime);
                     }
                     break;
                 default:
