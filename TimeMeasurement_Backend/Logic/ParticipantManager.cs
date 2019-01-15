@@ -38,6 +38,17 @@ namespace TimeMeasurement_Backend.Logic
         public static ParticipantManager Instance { get; } = new ParticipantManager();
 
         /// <summary>
+        /// Assign an unique starter to the participant and store it to the db
+        /// </summary>
+        /// <param name="participant">The participant to store</param>
+        public void AddParticipant(Participant participant)
+        {
+            int lastStarter = ParticipantRepo.Get().Select(p => p.Starter).Max();
+            participant.Starter = lastStarter + 1;
+            ParticipantRepo.Create(participant);
+        }
+
+        /// <summary>
         /// Assigns a time to the participant with the starter if possible
         /// </summary>
         /// <param name="starter">the starter number of the participant</param>
