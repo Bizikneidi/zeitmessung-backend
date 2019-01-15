@@ -1,0 +1,33 @@
+﻿//Paste into https://sequencediagram.org/
+//for visual representation
+
+title Beispiel Rennen durchführen
+participant Viewer
+participant Admin
+participant Station
+participant Server
+
+note over Viewer, Server: Aktoren verbinden sich
+Admin->Server: Connect
+Server->Admin: {\n    Command: State,\n    Data: Disabled\n}
+Viewer->Server: Connect
+Server->Viewer: {\n    Command: State,\n    Data: Disabled\n}
+Station->Server: Connect
+Server->Admin: {\n    Command: State,\n    Data: Ready\n}
+Server->Viewer: {\n    Command: State,\n    Data: Ready\n}
+note over Viewer, Server: Rennen wird gestartet
+Admin->Server: {\n    Command: Start,\n    Data: 463\n}
+Server->Station:{\n    Command: StartMeasuring,\n    Data: null\n}
+Station->Server: {\n    Command: MeasuredStart,\n    Data: 735\n}
+Server->Admin: {\n    Command: State,\n    Data: InProgress\n}
+Server->Viewer: {\n    Command: State,\n    Data: InProgress\n}
+Server->Admin: {\n    Command: RaceStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742\n        Participants: [...] \n    }\n}
+Server->Viewer: {\n    Command: RaceStart,\n    Data:\n    {\n        StartTime:735\n        CurrentTime: 742\n        Participants: [...] \n    }\n}
+note over Viewer, Server: Teilnehmer erreicht das Ziel
+Station->Server: {\n    Command: MeasuredStop,\n    Data: 89723\n}
+Server->Admin: {\n    Command: MeasuredStop,\n    Data: 89723\n}
+Admin->Server: {\n    Command: AssignTime,\n    Data:\n    {\n        Starter:3\n        Time: 89723\n    }\n}
+note over Viewer, Server: Alle Teilnehmer sind im Ziel angelangt
+Server->Station:{\n    Command: StopMeasuring,\n    Data: null\n}
+Server->Admin: {\n    Command: RaceEnd,\n    Data: null\n}
+Server->Viewer: {\n    Command: RaceEnd,\n    Data: null\n}

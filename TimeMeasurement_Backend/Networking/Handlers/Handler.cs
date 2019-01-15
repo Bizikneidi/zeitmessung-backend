@@ -58,7 +58,6 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <returns></returns>
         protected async Task ListenAsync(WebSocket ws)
         {
-            //ws must not be null
             if (ws == null)
             {
                 return;
@@ -95,7 +94,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <summary>
         /// Gets called, whenever a websocket disconnects
         /// </summary>
-        /// <param name="disconnected">The ws which lost connection</param>
+        /// <param name="disconnected">The websocket which lost connection</param>
         protected abstract void OnDisconnect(WebSocket disconnected);
 
         /// <summary>
@@ -106,7 +105,6 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <returns></returns>
         protected void SendMessage(WebSocket receiver, Message<TCommands> toSend)
         {
-            //receiver must not be null
             if (receiver == null)
             {
                 return;
@@ -116,7 +114,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(toSend));
 
             receiver.SendAsync(
-                new ArraySegment<byte>(data, 0, data.Count(b => b != 0)), //Arraysegment with length of not 0 bytes
+                new ArraySegment<byte>(data, 0, data.Count(b => b != 0)),
                 WebSocketMessageType.Text,
                 true, //Message is not split
                 CancellationToken.None
