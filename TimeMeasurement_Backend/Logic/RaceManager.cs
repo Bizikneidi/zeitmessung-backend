@@ -30,6 +30,8 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         private Race _currentRace;
 
+        public Race CurrentRace { get; set; }
+
         /// <summary>
         /// The state of the current race
         /// </summary>
@@ -41,7 +43,7 @@ namespace TimeMeasurement_Backend.Logic
         public State CurrentState
         {
             get => _currentState;
-            private set
+            set
             {
                 var prev = _currentState;
                 _currentState = value;

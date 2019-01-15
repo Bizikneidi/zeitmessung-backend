@@ -15,12 +15,26 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public event Action<Participant> ParticipantFinished;
 
+        private readonly TimeMeter _timeMeter = TimeMeter.Instance;
+        private readonly RaceManager _raceManager = RaceManager.Instance;
+
+        //all not yet assigned measurements
+        private readonly List<long> _measurements;
+
         /// <summary>
         /// All participants taking part in the current race
         /// </summary>
-        public IEnumerable<Participant> CurrentParticipants => GetParticipants(_currentRace.Id);
+        public IEnumerable<Participant> CurrentParticipants => GetParticipants(_raceManager.CurrentRace.Id);
 
-        private ParticipantManager() { }
+        /// <summary>
+        /// All recorded measurements which are not assigned to a participant yet
+        /// </summary>
+        public IEnumerable<long> UnassignedMeasurements => _measurements;
+
+        private ParticipantManager() {
+            _measurements = new List<long>();
+            _timeMeter.OnMeasurement += measurement => _measurements.Add(measurement);
+        }
         public static ParticipantManager Instance { get; } = new ParticipantManager();
 
         /// <summary>
@@ -38,7 +52,7 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             //Make sure a participant with the starter exists
-            var participant = ParticipantRepo.Get(r => r.Starter == starter && r.Race.Id == _currentRace.Id, r => r.Race).FirstOrDefault();
+            var participant = ParticipantRepo.Get(r => r.Starter == starter && r.Race.Id == _raceManager.CurrentRace.Id, r => r.Race).FirstOrDefault();
             if (participant == null)
             {
                 return false;
@@ -54,8 +68,8 @@ namespace TimeMeasurement_Backend.Logic
             // ReSharper disable once InvertIf
             if (CurrentParticipants.All(r => r.Time != 0))
             {
-                _currentRace = null;
-                CurrentState = State.Ready;
+                _raceManager.CurrentRace = null;
+                _raceManager.CurrentState = RaceManager.State.Ready;
             }
 
             return true;
