@@ -28,8 +28,6 @@ namespace TimeMeasurement_Backend.Logic
         /// <summary>
         /// The current race, which is being managed
         /// </summary>
-        private Race _currentRace;
-
         public Race CurrentRace { get; set; }
 
         /// <summary>
@@ -61,7 +59,7 @@ namespace TimeMeasurement_Backend.Logic
             get
             {
                 long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                return _raceRepo.Get(r => (_currentRace == null || r.Id != _currentRace.Id) && r.Done == false && r.Date > now);
+                return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date > now);
             }
         }
 
@@ -75,7 +73,7 @@ namespace TimeMeasurement_Backend.Logic
             {
                 long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 long twelveHours = 12 * 60 * 60 * 1000;
-                return _raceRepo.Get(r => (_currentRace == null || r.Id != _currentRace.Id) && r.Done == false && r.Date >= now - twelveHours && r.Date <= now + twelveHours);
+                return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date >= now - twelveHours && r.Date <= now + twelveHours);
             }
         }
 
@@ -87,7 +85,7 @@ namespace TimeMeasurement_Backend.Logic
             get
             {
                 long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                return _raceRepo.Get(r => (_currentRace == null || r.Id != _currentRace.Id) && r.Done && r.Date < now);
+                return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done && r.Date < now);
             }
         }
 
@@ -152,8 +150,8 @@ namespace TimeMeasurement_Backend.Logic
                 return;
             }
 
-            _currentRace = _raceRepo.Get(r => r.Id == raceId).FirstOrDefault();
-            if (_currentRace == null)
+            CurrentRace = _raceRepo.Get(r => r.Id == raceId).FirstOrDefault();
+            if (CurrentRace == null)
             {
                 return;
             }
