@@ -176,7 +176,7 @@ namespace TimeMeasurement_Backend.Logic
             {
                 return;
             }
-
+            CurrentRace.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             CurrentState = State.InProgress;
         }
     }

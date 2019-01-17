@@ -43,7 +43,7 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="participant">The participant to store</param>
         public void AddParticipant(Participant participant)
         {
-            int lastStarter = ParticipantRepo.Get().Select(p => p.Starter).Max();
+            int lastStarter = ParticipantRepo.Get(p => p.Race.Id == participant.Race.Id, includes: p => p.Race).Select(p => p.Starter).Max();
             participant.Starter = lastStarter + 1;
             ParticipantRepo.Create(participant);
         }
@@ -63,7 +63,7 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             //Make sure a participant with the starter exists
-            var participant = ParticipantRepo.Get(r => r.Starter == starter && r.Race.Id == _raceManager.CurrentRace.Id, r => r.Race).FirstOrDefault();
+            var participant = ParticipantRepo.Get(r => r.Starter == starter && r.Race.Id == _raceManager.CurrentRace.Id && r.Time == 0, r => r.Race).FirstOrDefault();
             if (participant == null)
             {
                 return false;
