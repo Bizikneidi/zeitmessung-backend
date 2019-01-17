@@ -28,7 +28,7 @@ namespace TimeMeasurement_Backend.Logic
         /// <summary>
         /// The current race, which is being managed
         /// </summary>
-        public Race CurrentRace { get; set; }
+        public Race CurrentRace { get; private set; }
 
         /// <summary>
         /// The state of the current race
@@ -41,7 +41,7 @@ namespace TimeMeasurement_Backend.Logic
         public State CurrentState
         {
             get => _currentState;
-            set
+            private set
             {
                 var prev = _currentState;
                 _currentState = value;
@@ -99,6 +99,14 @@ namespace TimeMeasurement_Backend.Logic
         /// Event to allow others to act accoring to the current state of the time meter
         /// </summary>
         public event Action<State, State> StateChanged;
+
+        internal void FinishRace()
+        {
+            CurrentRace.Done = true;
+            _raceRepo.Update(CurrentRace);
+            CurrentRace = null;
+            CurrentState = RaceManager.State.Ready;
+        }
 
         /// <summary>
         /// Adds a race to the database
