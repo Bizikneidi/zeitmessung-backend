@@ -44,6 +44,8 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="startTime">the station start time of the measurement</param>
         public void StartMeasurements(long startTime)
         {
+            if(RaceManager.Instance.CurrentState != RaceManager.State.StartRequested)
+                return;
             //store current system time and station time
             StartTime = startTime;
             _serverStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
