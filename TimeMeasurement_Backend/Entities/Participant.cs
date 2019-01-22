@@ -18,7 +18,7 @@ namespace TimeMeasurement_Backend.Entities
         /// slashes
         /// </summary>
         [Required]
-        [RegularExpression(@"^([A-ZÄÜÖ][a-zäüö]+)([- \.\/][A-ZÄÜÖ][a-zäüö]+)*$")]
+        [RegularExpression(@"^([A-ZÄÜÖa-zäüö]+)([- \.\/][A-ZÄÜÖa-zäüöß]+)*$")]
         public string City { get; set; }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace TimeMeasurement_Backend.Entities
         /// required
         /// </summary>
         [Required]
-        [RegularExpression(@"^([A-ZÄÜÖ][a-zäüö]+)([ ][A-ZÄÜÖ][a-zäüö]+)*$")]
+        [RegularExpression(@"^([A-ZÄÜÖ][a-zäüöß]+)([ ][A-ZÄÜÖ][a-zäüö]+)*$")]
         public string Firstname { get; set; }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace TimeMeasurement_Backend.Entities
         /// required
         /// </summary>
         [Required]
-        [RegularExpression(@"^[A-ZÄÜÖ][a-zäüö]+(-[A-ZÄÜÖ][a-zäüö]+)?$")]
+        [RegularExpression(@"^[A-ZÄÜÖ][a-zäüöß]+(-[A-ZÄÜÖ][a-zäüö]+)?$")]
         public string Lastname { get; set; }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace TimeMeasurement_Backend.Entities
         /// "-", ".", "/", " "
         /// </summary>
         [Required]
-        [RegularExpression(@"^([A-ZÄÜÖ][a-zäüö]+)([- \.\/][A-ZÄÜÖ][a-zäüö]+)*$")]
+        [RegularExpression(@"^([A-ZÄÜÖa-zäüöß]+)([- \.\/][A-ZÄÜÖa-zäüö]+)*$")]
         public string Street { get; set; }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace TimeMeasurement_Backend.Entities
         /// first year group: 1920
         /// </summary>
         [Required]
-        [Range(1919, 3000)]
+        [Range(1919, 3001)]
         public int YearGroup { get; set; }
     }
 }
