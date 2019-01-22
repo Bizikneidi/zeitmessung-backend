@@ -1,25 +1,16 @@
-using TimeMeasurement_Backend.Entities;
-using TimeMeasurement_Backend.Persistence;
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using TimeMeasurement_Backend.Entities;
+using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend.Logic
 {
     /// <summary>
     /// Manages participants
     /// </summary>
-    class ParticipantManager
+    internal class ParticipantManager
     {
-        public static ParticipantManager Instance { get; } = new ParticipantManager();
-
-        private TimeMeasurementRepository<Participant> ParticipantRepo { get; }
-
-        /// <summary>
-        /// Event to allow others to check, whenever a participant finishes a race
-        /// </summary>
-        public event Action<Participant> ParticipantFinished;
-
         //all not yet assigned measurements
         private readonly List<long> _measurements;
 
@@ -28,10 +19,14 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public IEnumerable<Participant> CurrentParticipants => GetParticipants(RaceManager.Instance.CurrentRace.Id);
 
+        public static ParticipantManager Instance { get; } = new ParticipantManager();
+
         /// <summary>
         /// All recorded measurements which are not assigned to a participant yet
         /// </summary>
         public IEnumerable<long> UnassignedMeasurements => _measurements;
+
+        private TimeMeasurementRepository<Participant> ParticipantRepo { get; }
 
         private ParticipantManager()
         {
@@ -39,6 +34,11 @@ namespace TimeMeasurement_Backend.Logic
             TimeMeter.Instance.OnMeasurement += measurement => _measurements.Add(measurement);
             ParticipantRepo = new TimeMeasurementRepository<Participant>();
         }
+
+        /// <summary>
+        /// Event to allow others to check, whenever a participant finishes a race
+        /// </summary>
+        public event Action<Participant> ParticipantFinished;
 
         /// <summary>
         /// Assign an unique starter to the participant and store it to the db
@@ -49,6 +49,16 @@ namespace TimeMeasurement_Backend.Logic
             int lastStarter = ParticipantRepo.Get(p => p.Race.Id == participant.Race.Id, p => p.Race)?.Select(p => p.Starter).Count() ?? 0;
             participant.Starter = lastStarter + 1;
             ParticipantRepo.Create(participant);
+        }
+
+        /// <summary>
+        /// Get all participants to a specific race
+        /// </summary>
+        /// <param name="raceId">the id of the race</param>
+        /// <returns>all participants who took part in the race</returns>
+        public IEnumerable<Participant> GetParticipants(int raceId)
+        {
+            return ParticipantRepo.Get(r => r.Race.Id == raceId, r => r.Race);
         }
 
         /// <summary>
@@ -86,16 +96,6 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Get all participants to a specific race
-        /// </summary>
-        /// <param name="raceId">the id of the race</param>
-        /// <returns>all participants who took part in the race</returns>
-        public IEnumerable<Participant> GetParticipants(int raceId)
-        {
-            return ParticipantRepo.Get(r => r.Race.Id == raceId, r => r.Race);
         }
     }
 }

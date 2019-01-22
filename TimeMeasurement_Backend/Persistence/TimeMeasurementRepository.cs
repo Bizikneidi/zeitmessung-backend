@@ -33,7 +33,6 @@ namespace TimeMeasurement_Backend.Persistence
             {
                 Console.WriteLine(e);
             }
-            
         }
 
         /// <summary>

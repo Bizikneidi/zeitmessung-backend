@@ -7,10 +7,6 @@ namespace TimeMeasurement_Backend.Logic
     /// </summary>
     public class TimeMeter
     {
-        public static TimeMeter Instance { get; } = new TimeMeter();
-
-        private TimeMeter() { }
-
         /// <summary>
         /// The internal time of the server, at the time of StartMeasurements(starttime)
         /// </summary>
@@ -29,10 +25,14 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
+        public static TimeMeter Instance { get; } = new TimeMeter();
+
         /// <summary>
         /// The internal time of the station, at the time of StartMeasurements(starttime)
         /// </summary>
         public long StartTime { get; private set; }
+
+        private TimeMeter() { }
 
         /// <summary>
         /// Event gets fired, whenever another time has been measured
@@ -45,8 +45,11 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="startTime">the station start time of the measurement</param>
         public void StartMeasurements(long startTime)
         {
-            if(RaceManager.Instance.CurrentState != RaceManager.State.StartRequested)
+            if (RaceManager.Instance.CurrentState != RaceManager.State.StartRequested)
+            {
                 return;
+            }
+
             //store current system time and station time
             StartTime = startTime;
             _serverStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();

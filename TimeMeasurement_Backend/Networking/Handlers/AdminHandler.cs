@@ -57,6 +57,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                     {
                         RaceManager.Instance.RequestStart((int)raceId);
                     }
+
                     break;
                 //Admin has created a race
                 case AdminCommands.CreateRace:

@@ -22,17 +22,16 @@ namespace TimeMeasurement_Backend.Logic
             Disabled //The racemanager is not ready and nobody can request or start a race
         }
 
-        public static RaceManager Instance { get; } = new RaceManager();
-
         //Repos for database access
         private readonly TimeMeasurementRepository<Race> _raceRepo;
+
+        private State _currentState;
 
         /// <summary>
         /// The current, active race
         /// </summary>
         public Race CurrentRace { get; private set; }
 
-        private State _currentState;
         /// <summary>
         /// The current state of the race
         /// </summary>
@@ -59,18 +58,7 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
-        /// <summary>
-        /// All races that can be started at the moment
-        /// </summary>
-        public IEnumerable<Race> StartableRaces
-        {
-            get
-            {
-                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                long twelveHours = 12 * 60 * 60 * 1000;
-                return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date >= now - twelveHours && r.Date <= now + twelveHours);
-            }
-        }
+        public static RaceManager Instance { get; } = new RaceManager();
 
         /// <summary>
         /// All races that have been done in the future the past
@@ -84,6 +72,19 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
+        /// <summary>
+        /// All races that can be started at the moment
+        /// </summary>
+        public IEnumerable<Race> StartableRaces
+        {
+            get
+            {
+                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                long twelveHours = 12 * 60 * 60 * 1000;
+                return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date >= now - twelveHours && r.Date <= now + twelveHours);
+            }
+        }
+
         private RaceManager()
         {
             _currentState = State.Disabled;
@@ -94,14 +95,6 @@ namespace TimeMeasurement_Backend.Logic
         /// Event to allow others to act accoring to the current state of the time meter
         /// </summary>
         public event Action<State, State> StateChanged;
-
-        public void FinishRace()
-        {
-            CurrentRace.Done = true;
-            _raceRepo.Update(CurrentRace);
-            CurrentRace = null;
-            CurrentState = RaceManager.State.Ready;
-        }
 
         /// <summary>
         /// Adds a race to the database
@@ -123,6 +116,14 @@ namespace TimeMeasurement_Backend.Logic
         public void Disable()
         {
             CurrentState = State.Disabled;
+        }
+
+        public void FinishRace()
+        {
+            CurrentRace.Done = true;
+            _raceRepo.Update(CurrentRace);
+            CurrentRace = null;
+            CurrentState = State.Ready;
         }
 
         /// <summary>
@@ -175,7 +176,7 @@ namespace TimeMeasurement_Backend.Logic
             CurrentRace.Date = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             CurrentState = State.InProgress;
 
-            if(!ParticipantManager.Instance.CurrentParticipants.Any())
+            if (!ParticipantManager.Instance.CurrentParticipants.Any())
             {
                 FinishRace();
             }

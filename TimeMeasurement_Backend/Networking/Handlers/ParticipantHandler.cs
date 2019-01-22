@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.MessageData;
-using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend.Networking.Handlers
 {
@@ -18,7 +15,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <summary>
         /// Logic to manage Participants
         /// </summary>
-        private ParticipantManager _participantManager = ParticipantManager.Instance;
+        private readonly ParticipantManager _participantManager = ParticipantManager.Instance;
 
 
         /// <summary>

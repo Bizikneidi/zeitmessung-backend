@@ -45,12 +45,14 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                         TimeMeter.Instance.StartMeasurements(startTime);
                         RaceManager.Instance.Start();
                     }
+
                     break;
                 case StationCommands.MeasuredStop: //Station has detected that someone finished and recorded the end time
                     if (received.Data is long endTime)
                     {
                         TimeMeter.Instance.StopMeasurement(endTime);
                     }
+
                     break;
                 default:
                     //Command does not exist

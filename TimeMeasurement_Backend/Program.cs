@@ -4,11 +4,6 @@ using System.Net;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using TimeMeasurement_Backend.Entities;
-using TimeMeasurement_Backend.Networking.Handlers;
-using TimeMeasurement_Backend.Networking.MessageData;
 
 namespace TimeMeasurement_Backend
 {

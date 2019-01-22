@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Net.Mail;
 
 namespace TimeMeasurement_Backend.Entities.Constraints
 {
@@ -22,7 +21,6 @@ namespace TimeMeasurement_Backend.Entities.Constraints
             }
 
             return new ValidationResult("Input is not a valid URL");
-
         }
     }
 }
