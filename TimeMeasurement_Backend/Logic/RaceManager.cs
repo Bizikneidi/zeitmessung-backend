@@ -22,21 +22,19 @@ namespace TimeMeasurement_Backend.Logic
             Disabled //The racemanager is not ready and nobody can request or start a race
         }
 
+        public static RaceManager Instance { get; } = new RaceManager();
+
         //Repos for database access
         private readonly TimeMeasurementRepository<Race> _raceRepo;
 
         /// <summary>
-        /// The current race, which is being managed
+        /// The current, active race
         /// </summary>
         public Race CurrentRace { get; private set; }
 
-        /// <summary>
-        /// The state of the current race
-        /// </summary>
         private State _currentState;
-
         /// <summary>
-        /// The current state of the time meter
+        /// The current state of the race
         /// </summary>
         public State CurrentState
         {
@@ -49,10 +47,8 @@ namespace TimeMeasurement_Backend.Logic
             }
         }
 
-        public static RaceManager Instance { get; } = new RaceManager();
-
         /// <summary>
-        /// All races of the future
+        /// All races which take place in the future
         /// </summary>
         public IEnumerable<Race> FutureRaces
         {
@@ -62,7 +58,6 @@ namespace TimeMeasurement_Backend.Logic
                 return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date > now);
             }
         }
-
 
         /// <summary>
         /// All races that can be started at the moment
@@ -78,7 +73,7 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// All races of the past
+        /// All races that have been done in the future the past
         /// </summary>
         public IEnumerable<Race> PastRaces
         {
@@ -100,7 +95,7 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public event Action<State, State> StateChanged;
 
-        internal void FinishRace()
+        public void FinishRace()
         {
             CurrentRace.Done = true;
             _raceRepo.Update(CurrentRace);
@@ -181,7 +176,9 @@ namespace TimeMeasurement_Backend.Logic
             CurrentState = State.InProgress;
 
             if(!ParticipantManager.Instance.CurrentParticipants.Any())
+            {
                 FinishRace();
+            }
         }
     }
 }

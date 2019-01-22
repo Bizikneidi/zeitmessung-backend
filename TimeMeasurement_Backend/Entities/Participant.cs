@@ -64,7 +64,7 @@ namespace TimeMeasurement_Backend.Entities
 
         /// <summary>
         /// ISO - Country
-        /// Alpha 2 Code
+        /// Alpha 3 Code
         /// </summary>
         [IsCountry]
         public string Nationality { get; set; }

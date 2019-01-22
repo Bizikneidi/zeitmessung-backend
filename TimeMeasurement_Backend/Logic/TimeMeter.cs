@@ -3,12 +3,13 @@
 namespace TimeMeasurement_Backend.Logic
 {
     /// <summary>
-    /// Allows keeping track of the time and measure times
+    /// Allows keeping track of the time and measuring times
     /// </summary>
     public class TimeMeter
     {
-        private TimeMeter() { }
         public static TimeMeter Instance { get; } = new TimeMeter();
+
+        private TimeMeter() { }
 
         /// <summary>
         /// The internal time of the server, at the time of StartMeasurements(starttime)

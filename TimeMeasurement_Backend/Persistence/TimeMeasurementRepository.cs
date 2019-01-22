@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace TimeMeasurement_Backend.Persistence
         {
             try
             {
+                Validator.ValidateObject(item, new ValidationContext(item), true);
                 using (var db = new TimeMeasurementDbContext())
                 {
                     db.Set<T>().Attach(item);
@@ -92,6 +94,7 @@ namespace TimeMeasurement_Backend.Persistence
         {
             try
             {
+                Validator.ValidateObject(item, new ValidationContext(item));
                 using (var db = new TimeMeasurementDbContext())
                 {
                     db.Set<T>().Attach(item);

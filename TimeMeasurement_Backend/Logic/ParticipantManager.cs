@@ -6,17 +6,19 @@ using System.Collections.Generic;
 
 namespace TimeMeasurement_Backend.Logic
 {
+    /// <summary>
+    /// Manages participants
+    /// </summary>
     class ParticipantManager
     {
-        private TimeMeasurementRepository<Participant> ParticipantRepo { get; } = new TimeMeasurementRepository<Participant>();
+        public static ParticipantManager Instance { get; } = new ParticipantManager();
+
+        private TimeMeasurementRepository<Participant> ParticipantRepo { get; }
 
         /// <summary>
-        /// Event to allow others to check, whenever a participant finishes the race
+        /// Event to allow others to check, whenever a participant finishes a race
         /// </summary>
         public event Action<Participant> ParticipantFinished;
-
-        private readonly TimeMeter _timeMeter = TimeMeter.Instance;
-        private readonly RaceManager _raceManager = RaceManager.Instance;
 
         //all not yet assigned measurements
         private readonly List<long> _measurements;
@@ -24,18 +26,19 @@ namespace TimeMeasurement_Backend.Logic
         /// <summary>
         /// All participants taking part in the current race
         /// </summary>
-        public IEnumerable<Participant> CurrentParticipants => GetParticipants(_raceManager.CurrentRace.Id);
+        public IEnumerable<Participant> CurrentParticipants => GetParticipants(RaceManager.Instance.CurrentRace.Id);
 
         /// <summary>
         /// All recorded measurements which are not assigned to a participant yet
         /// </summary>
         public IEnumerable<long> UnassignedMeasurements => _measurements;
 
-        private ParticipantManager() {
+        private ParticipantManager()
+        {
             _measurements = new List<long>();
-            _timeMeter.OnMeasurement += measurement => _measurements.Add(measurement);
+            TimeMeter.Instance.OnMeasurement += measurement => _measurements.Add(measurement);
+            ParticipantRepo = new TimeMeasurementRepository<Participant>();
         }
-        public static ParticipantManager Instance { get; } = new ParticipantManager();
 
         /// <summary>
         /// Assign an unique starter to the participant and store it to the db
@@ -43,7 +46,7 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="participant">The participant to store</param>
         public void AddParticipant(Participant participant)
         {
-            int lastStarter = ParticipantRepo.Get(p => p.Race.Id == participant.Race.Id, includes: p => p.Race).Select(p => p.Starter).Max();
+            int lastStarter = ParticipantRepo.Get(p => p.Race.Id == participant.Race.Id, p => p.Race)?.Select(p => p.Starter).Count() ?? 0;
             participant.Starter = lastStarter + 1;
             ParticipantRepo.Create(participant);
         }
@@ -63,7 +66,7 @@ namespace TimeMeasurement_Backend.Logic
             }
 
             //Make sure a participant with the starter exists
-            var participant = ParticipantRepo.Get(r => r.Starter == starter && r.Race.Id == _raceManager.CurrentRace.Id && r.Time == 0, r => r.Race).FirstOrDefault();
+            var participant = ParticipantRepo.Get(r => r.Starter == starter && r.Race.Id == RaceManager.Instance.CurrentRace.Id && r.Time == 0, r => r.Race).FirstOrDefault();
             if (participant == null)
             {
                 return false;
@@ -79,7 +82,7 @@ namespace TimeMeasurement_Backend.Logic
             // ReSharper disable once InvertIf
             if (CurrentParticipants.All(r => r.Time != 0))
             {
-                _raceManager.FinishRace();
+                RaceManager.Instance.FinishRace();
             }
 
             return true;

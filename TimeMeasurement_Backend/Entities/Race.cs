@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using TimeMeasurement_Backend.Entities.Constraints;
+
 namespace TimeMeasurement_Backend.Entities
 {
     /// <summary>
@@ -18,11 +21,13 @@ namespace TimeMeasurement_Backend.Entities
         /// <summary>
         /// Link to the announcement of the race
         /// </summary>
+        [IsUrl]
         public string Link { get; set; }
 
         /// <summary>
         /// The Title of the race
         /// </summary>
+        [Required]
         public string Title { get; set; }
 
         /// <summary>
