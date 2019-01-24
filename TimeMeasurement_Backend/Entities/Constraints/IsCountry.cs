@@ -33,7 +33,7 @@ namespace TimeMeasurement_Backend.Entities.Constraints
         {
             if (value == null)
             {
-                return new ValidationResult("Input was null");
+                return ValidationResult.Success;
             }
 
             string code = ((string)value).ToUpper();

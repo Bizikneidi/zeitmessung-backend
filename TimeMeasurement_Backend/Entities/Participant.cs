@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using TimeMeasurement_Backend.Entities.Constraints;
 
 namespace TimeMeasurement_Backend.Entities
