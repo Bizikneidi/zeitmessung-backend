@@ -46,6 +46,9 @@ namespace TimeMeasurement_Backend.Logic
         /// <param name="participant">The participant to store</param>
         public void AddParticipant(Participant participant)
         {
+            if (!RaceManager.Instance.FutureRaces.Select(r => r.Id).Contains(participant.Id))
+                return;
+
             int lastStarter = ParticipantRepo.Get(p => p.Race.Id == participant.Race.Id, p => p.Race)?.Select(p => p.Starter).Count() ?? 0;
             participant.Starter = lastStarter + 1;
             ParticipantRepo.Create(participant);
