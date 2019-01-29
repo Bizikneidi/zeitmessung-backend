@@ -12,9 +12,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
     /// </summary>
     public class AdminHandler : Handler<AdminCommands>
     {
-        /// <summary>
         /// The weboscket corresponding to the admin
-        /// </summary>
         private WebSocket _admin;
 
         public AdminHandler()

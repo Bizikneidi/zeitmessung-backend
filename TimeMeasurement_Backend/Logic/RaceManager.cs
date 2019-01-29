@@ -7,7 +7,7 @@ using TimeMeasurement_Backend.Persistence;
 namespace TimeMeasurement_Backend.Logic
 {
     /// <summary>
-    /// Allows for a race state management, fires events when participants finish, a race ends, ...
+    /// Allows for race state management, fires events when participants finishes, a race ends, ...
     /// </summary>
     public class RaceManager
     {
@@ -16,13 +16,13 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public enum State
         {
-            Ready, //The racemanager is theoretically ready to start a race
-            StartRequested, //The admin requested the start of a race
+            Ready, //The racemanager is theoretically ready to start a race (A station has connected)
+            StartRequested, //The admin requested the start of a race (The admin has pressed start)
             InProgress, //A race is in progress
-            Disabled //The racemanager is not ready and nobody can request or start a race
+            Disabled //The racemanager is not ready and nobody can request or start a race (no station is connected)
         }
 
-        //Repos for database access
+        ///Repo for database access
         private readonly TimeMeasurementRepository<Race> _raceRepo;
 
         private State _currentState;
@@ -33,7 +33,7 @@ namespace TimeMeasurement_Backend.Logic
         public Race CurrentRace { get; private set; }
 
         /// <summary>
-        /// The current state of the race
+        /// The current state of the active race
         /// </summary>
         public State CurrentState
         {
@@ -54,14 +54,16 @@ namespace TimeMeasurement_Backend.Logic
             get
             {
                 long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                //Note: Races of the future can be started in a 12 hour margin.
                 return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date > now);
             }
         }
 
+        ///Singleton
         public static RaceManager Instance { get; } = new RaceManager();
 
         /// <summary>
-        /// All races that have been done in the future the past
+        /// All races that have been done
         /// </summary>
         public IEnumerable<Race> PastRaces
         {
@@ -115,11 +117,20 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public void Disable()
         {
+            FinishRace();
             CurrentState = State.Disabled;
         }
 
+        /// <summary>
+        /// Ends the currently active race
+        /// </summary>
         public void FinishRace()
         {
+            if(CurrentRace == null)
+            {
+                return;
+            }
+
             CurrentRace.Done = true;
             _raceRepo.Update(CurrentRace);
             CurrentRace = null;
@@ -127,7 +138,7 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Allows others to set the time meter to ready
+        /// Allows the station to set the State to ready
         /// </summary>
         public void Ready()
         {
@@ -139,7 +150,7 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Allows others to set the time meter to StartRequested
+        /// Allows others to set the State to StartRequested
         /// </summary>
         public void RequestStart(int raceId)
         {
@@ -164,7 +175,7 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Allows others to set the time meter to InProgress
+        /// Allows others to set the State to InProgress (Starts a race)
         /// </summary>
         public void Start()
         {

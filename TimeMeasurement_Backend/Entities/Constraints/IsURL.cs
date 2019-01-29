@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations;
 namespace TimeMeasurement_Backend.Entities.Constraints
 {
     /// <summary>
-    /// Attribute to check if string is an url
+    /// Attribute to check if string is an url (RFC1738)
     /// </summary>
     public class IsUrl : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            //URL can be Null
             if (value == null)
             {
                 return ValidationResult.Success;

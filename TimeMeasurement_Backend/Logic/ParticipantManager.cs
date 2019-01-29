@@ -7,11 +7,10 @@ using TimeMeasurement_Backend.Persistence;
 namespace TimeMeasurement_Backend.Logic
 {
     /// <summary>
-    /// Manages participants
+    /// Manages the current participants in a race, Allows to retreive participants for a certain race
     /// </summary>
     internal class ParticipantManager
     {
-        //all not yet assigned measurements
         private readonly List<long> _measurements;
 
         /// <summary>
@@ -19,6 +18,7 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public IEnumerable<Participant> CurrentParticipants => GetParticipants(RaceManager.Instance.CurrentRace.Id);
 
+        ///Singleton
         public static ParticipantManager Instance { get; } = new ParticipantManager();
 
         /// <summary>
@@ -26,6 +26,7 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public IEnumerable<long> UnassignedMeasurements => _measurements;
 
+        ///Repository for Database Access
         private TimeMeasurementRepository<Participant> ParticipantRepo { get; }
 
         private ParticipantManager()
@@ -36,16 +37,17 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Event to allow others to check, whenever a participant finishes a race
+        /// Event to allow others to get notified, whenever a participant finishes a race
         /// </summary>
         public event Action<Participant> ParticipantFinished;
 
         /// <summary>
-        /// Assign an unique starter to the participant and store it to the db
+        /// Assign an unique starter to the participant and store it in the db
         /// </summary>
-        /// <param name="participant">The participant to store</param>
+        /// <param name="participant">The participant to register</param>
         public void AddParticipant(Participant participant)
         {
+            //Participant must register for a future race
             if (!RaceManager.Instance.FutureRaces.Select(r => r.Id).Contains(participant.Race.Id))
                 return;
 
@@ -55,7 +57,7 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Get all participants to a specific race
+        /// Get all participants for a specific race
         /// </summary>
         /// <param name="raceId">the id of the race</param>
         /// <returns>all participants who took part in the race</returns>
@@ -65,11 +67,11 @@ namespace TimeMeasurement_Backend.Logic
         }
 
         /// <summary>
-        /// Assigns a time to the participant with the starter if possible
+        /// Assigns a time to a participant, if possible
         /// </summary>
         /// <param name="starter">the starter number of the participant</param>
         /// <param name="time">the time to assign to the participant</param>
-        /// <returns>if the assignment was successful</returns>
+        /// <returns>true, if the assignment was successful</returns>
         public bool TryAssignTimeToRunner(int starter, long time)
         {
             //Prevent assigning faulty times to participants
@@ -89,9 +91,10 @@ namespace TimeMeasurement_Backend.Logic
             _measurements.Remove(time);
             participant.Time = time;
             ParticipantRepo.Update(participant);
+            //Notify others
             ParticipantFinished?.Invoke(participant);
 
-            //Every participant has finished
+            //Every participant has finished => End Race
             // ReSharper disable once InvertIf
             if (CurrentParticipants.All(r => r.Time != 0))
             {

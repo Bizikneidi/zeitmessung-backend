@@ -4,10 +4,11 @@ using System.Linq;
 namespace TimeMeasurement_Backend.Entities.Constraints
 {
     /// <summary>
-    /// Attribute to check if string is a country code (ISO - alpha 2)
+    /// Attribute to check if a string is a country code (ISO - alpha 3)
     /// </summary>
     public class IsCountry : ValidationAttribute
     {
+        ///List of all valid countries
         private static readonly string[] Countries =
         {
             "AFG", "ALA", "ALB", "DZA", "ASM", "AND", "AGO", "AIA", "ATA", "ATG", "ARG", "ARM", "ABW", "AUS", "AUT",
@@ -31,11 +32,12 @@ namespace TimeMeasurement_Backend.Entities.Constraints
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            //Country is optional
             if (value == null)
             {
                 return ValidationResult.Success;
             }
-
+            
             string code = ((string)value).ToUpper();
             return Countries.Any(c => c == code) ? ValidationResult.Success : new ValidationResult("Not a valid country.");
         }

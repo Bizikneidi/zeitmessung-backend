@@ -11,9 +11,9 @@ using TimeMeasurement_Backend.Networking.MessageData;
 namespace TimeMeasurement_Backend.Networking.Handlers
 {
     /// <summary>
-    /// Handles connections with websockets over Messages
+    /// Handles connections with websockets via Messages
     /// </summary>
-    /// <typeparam name="TCommands">The available Commands for the Messages</typeparam>
+    /// <typeparam name="TCommands">The available Set of Commands for the Messages</typeparam>
     public abstract class Handler<TCommands> where TCommands : Enum
     {
         /// <summary>
@@ -52,7 +52,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         protected abstract void HandleMessage(WebSocket sender, Message<TCommands> received);
 
         /// <summary>
-        /// Starts listening to Websocket and passes received Messages to HandleMessage
+        /// Starts listening to a Websocket and passes received Messages to HandleMessage
         /// </summary>
         /// <param name="ws">The websocket to listen to</param>
         /// <returns></returns>

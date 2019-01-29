@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classTimeMeasurement__Backend_1_1Networking_1_1Handlers_1_1Handler.html" title="TimeMeasurement_Backend.\lNetworking.Handlers.Handler\l\&lt; ParticipantCommands \&gt;" alt="" coords="5,5,199,61"/>
+<area shape="rect" id="node2" href="$classTimeMeasurement__Backend_1_1Networking_1_1Handlers_1_1ParticipantHandler.html" title="Handles a websocket connection with a potential participant " alt="" coords="247,5,457,61"/>
+</map>
