@@ -96,6 +96,7 @@ namespace TimeMeasurement_Backend.Logic
             if (CurrentParticipants.All(r => r.Time != 0))
             {
                 RaceManager.Instance.FinishRace();
+                _measurements.Clear();
             }
 
             return true;
