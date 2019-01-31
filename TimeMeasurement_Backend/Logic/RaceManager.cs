@@ -117,14 +117,14 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public void Disable()
         {
-            FinishRace();
+            AbortRace();
             CurrentState = State.Disabled;
         }
 
         /// <summary>
         /// Ends the currently active race
         /// </summary>
-        public void FinishRace()
+        public void CompleteRace()
         {
             if(CurrentRace == null)
             {
@@ -133,6 +133,20 @@ namespace TimeMeasurement_Backend.Logic
 
             CurrentRace.Done = true;
             _raceRepo.Update(CurrentRace);
+            CurrentRace = null;
+            CurrentState = State.Ready;
+        }
+
+        /// <summary>
+        /// Ends the currently active race
+        /// </summary>
+        public void AbortRace()
+        {
+            if(CurrentRace == null)
+            {
+                return;
+            }
+
             CurrentRace = null;
             CurrentState = State.Ready;
         }
@@ -189,7 +203,7 @@ namespace TimeMeasurement_Backend.Logic
 
             if (!ParticipantManager.Instance.CurrentParticipants.Any())
             {
-                FinishRace();
+                AbortRace();
             }
         }
     }

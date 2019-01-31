@@ -98,7 +98,7 @@ namespace TimeMeasurement_Backend.Logic
             // ReSharper disable once InvertIf
             if (CurrentParticipants.All(r => r.Time != 0))
             {
-                RaceManager.Instance.FinishRace();
+                RaceManager.Instance.CompleteRace();
                 _measurements.Clear();
             }
 
