@@ -26,7 +26,7 @@ namespace TimeMeasurement_Backend.Entities
 
         /// <summary>
         /// Link to the announcement of the race
-        /// Has to be a valid URL
+        /// Has to be a valid URL  (RFC1738)
         /// </summary>
         [IsUrl]
         public string Link { get; set; }

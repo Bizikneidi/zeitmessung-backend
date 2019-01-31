@@ -81,9 +81,11 @@ namespace TimeMeasurement_Backend.Logic
         {
             get
             {
-                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                long twelveHours = 12 * 60 * 60 * 1000;
-                return _raceRepo.Get(r => (CurrentRace == null || r.Id != CurrentRace.Id) && r.Done == false && r.Date >= now - twelveHours && r.Date <= now + twelveHours);
+                return _raceRepo.Get(r =>
+                    (CurrentRace == null || r.Id != CurrentRace.Id)
+                    && r.Done == false
+                    && DateTimeOffset.Now.Date == DateTimeOffset.FromUnixTimeMilliseconds(r.Date).ToUniversalTime().Date
+                );
             }
         }
 
@@ -126,7 +128,7 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public void CompleteRace()
         {
-            if(CurrentRace == null)
+            if (CurrentRace == null)
             {
                 return;
             }
@@ -142,7 +144,7 @@ namespace TimeMeasurement_Backend.Logic
         /// </summary>
         public void AbortRace()
         {
-            if(CurrentRace == null)
+            if (CurrentRace == null)
             {
                 return;
             }

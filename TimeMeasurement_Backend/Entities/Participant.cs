@@ -23,7 +23,7 @@ namespace TimeMeasurement_Backend.Entities
         public string City { get; set; }
 
         /// <summary>
-        /// Valid email (RFC1738)
+        /// Valid email
         /// </summary>
         [Required]
         [IsEmail]
