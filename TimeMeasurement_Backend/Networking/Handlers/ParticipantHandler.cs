@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using TimeMeasurement_Backend.Entities;
+using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.MessageData;
-using TimeMeasurement_Backend.Persistence;
 
 namespace TimeMeasurement_Backend.Networking.Handlers
 {
@@ -13,11 +13,10 @@ namespace TimeMeasurement_Backend.Networking.Handlers
     public class ParticipantHandler : Handler<ParticipantCommands>
     {
         /// <summary>
-        /// Repository to store all new participants
+        /// Logic to manage Participants
         /// </summary>
-        private readonly TimeMeasurementRepository<Participant> _repo;
+        private readonly ParticipantManager _participantManager = ParticipantManager.Instance;
 
-        public ParticipantHandler() => _repo = new TimeMeasurementRepository<Participant>();
 
         /// <summary>
         /// Connect with a potential participant and listen for his/her messages
@@ -26,6 +25,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
         /// <returns></returns>
         public async Task AddPotentialParticipant(WebSocket participant)
         {
+            SendRaces(participant);
             await ListenAsync(participant);
         }
 
@@ -36,14 +36,27 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 return;
             }
 
-            //Deserialize received Participant and store in DB
-            var participant = ((JObject)received.Data).ToObject<Participant>();
-            _repo.Create(participant);
+            //Deserialize received Participant, assign starter and store in DB
+            _participantManager.AddParticipant(((JObject)received.Data).ToObject<Participant>());
         }
 
         protected override void OnDisconnect(WebSocket disconnected)
         {
             //Nothing to clean up here!
+        }
+
+        /// <summary>
+        /// Sends the list of races of the furutre to a participant
+        /// </summary>
+        /// <param name="participant">The Websocket corresponding to a potential participant</param>
+        private void SendRaces(WebSocket participant)
+        {
+            var message = new Message<ParticipantCommands>
+            {
+                Command = ParticipantCommands.Races,
+                Data = RaceManager.Instance.FutureRaces
+            };
+            SendMessage(participant, message);
         }
     }
 }

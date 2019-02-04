@@ -15,9 +15,9 @@ namespace TimeMeasurement_Backend.Networking.MessageData
         public long CurrentTime { get; set; }
 
         /// <summary>
-        /// All the runners in the current race
+        /// All the participants in the current race
         /// </summary>
-        public IEnumerable<Runner> Runners { get; set; }
+        public IEnumerable<Participant> Participants { get; set; }
 
         /// <summary>
         /// The start time of the station
@@ -26,18 +26,18 @@ namespace TimeMeasurement_Backend.Networking.MessageData
     }
 
     /// <summary>
-    /// Used to transfer a starter number and a time to assign a runner his time
+    /// Used to transfer a starter number and a time to assign a participant his time
     /// </summary>
     // ReSharper disable once InconsistentNaming
     public class AssignmentDTO
     {
         /// <summary>
-        /// The starter number of the runner
+        /// The starter number of the participant
         /// </summary>
         public int Starter { get; set; }
 
         /// <summary>
-        /// The time of the runner
+        /// The time of the participant
         /// </summary>
         public long Time { get; set; }
     }

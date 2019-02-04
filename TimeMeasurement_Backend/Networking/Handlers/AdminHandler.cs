@@ -1,6 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using TimeMeasurement_Backend.Entities;
 using TimeMeasurement_Backend.Logic;
 using TimeMeasurement_Backend.Networking.MessageData;
 
@@ -11,15 +12,13 @@ namespace TimeMeasurement_Backend.Networking.Handlers
     /// </summary>
     public class AdminHandler : Handler<AdminCommands>
     {
-        /// <summary>
         /// The weboscket corresponding to the admin
-        /// </summary>
         private WebSocket _admin;
 
         public AdminHandler()
         {
             RaceManager.Instance.StateChanged += OnRaceManagerStateChanged;
-            RaceManager.Instance.TimeMeter.OnMeasurement += SendMeasuredStop;
+            TimeMeter.Instance.OnMeasurement += SendMeasuredStop;
         }
 
         /// <summary>
@@ -37,6 +36,7 @@ namespace TimeMeasurement_Backend.Networking.Handlers
 
             _admin = admin;
             SendCurrentState();
+            SendAvailableRaces();
             if (RaceManager.Instance.CurrentState == RaceManager.State.InProgress)
             {
                 SendRaceStart();
@@ -51,13 +51,22 @@ namespace TimeMeasurement_Backend.Networking.Handlers
             {
                 //Admin has pressed start
                 case AdminCommands.Start:
-                    RaceManager.Instance.RequestStart();
+                    if (received.Data is long raceId) //Check if received data is valid
+                    {
+                        RaceManager.Instance.RequestStart((int)raceId);
+                    }
+
+                    break;
+                //Admin has created a race
+                case AdminCommands.CreateRace:
+                    var race = ((JObject)received.Data).ToObject<Race>();
+                    RaceManager.Instance.CreateRace(race);
                     break;
                 //Admin has assigned a time to a runner
                 case AdminCommands.AssignTime:
                     var assignment = ((JObject)received.Data).ToObject<AssignmentDTO>();
                     //Try to assign the time
-                    if (!RaceManager.Instance.TryAssignTimeToRunner(assignment.Starter, assignment.Time))
+                    if (!ParticipantManager.Instance.TryAssignTimeToRunner(assignment.Starter, assignment.Time))
                     {
                         //something went wrong => resend time
                         SendMeasuredStop(assignment.Time);
@@ -81,10 +90,26 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 SendRaceStart();
             }
 
-            if (prev == RaceManager.State.InProgress)
+            if (prev != RaceManager.State.InProgress)
             {
-                SendRaceEnd();
+                return;
             }
+
+            SendRaceEnd();
+            SendAvailableRaces();
+        }
+
+        /// <summary>
+        /// Send all races the admin could start at the moment
+        /// </summary>
+        private void SendAvailableRaces()
+        {
+            var message = new Message<AdminCommands>
+            {
+                Command = AdminCommands.AvailableRaces,
+                Data = RaceManager.Instance.StartableRaces
+            };
+            SendMessage(_admin, message);
         }
 
         /// <summary>
@@ -137,15 +162,15 @@ namespace TimeMeasurement_Backend.Networking.Handlers
                 Command = AdminCommands.RaceStart,
                 Data = new RaceStartDTO
                 {
-                    StartTime = RaceManager.Instance.TimeMeter.StartTime,
-                    CurrentTime = RaceManager.Instance.TimeMeter.ApproximatedCurrentTime,
-                    Runners = RaceManager.Instance.CurrentRunners
+                    StartTime = TimeMeter.Instance.StartTime,
+                    CurrentTime = TimeMeter.Instance.ApproximatedCurrentTime,
+                    Participants = ParticipantManager.Instance.CurrentParticipants
                 }
             };
             SendMessage(_admin, message);
 
             //Also send all not yet assigned times
-            foreach (long measurement in RaceManager.Instance.UnassignedMeasurements)
+            foreach (long measurement in ParticipantManager.Instance.UnassignedMeasurements)
             {
                 SendMeasuredStop(measurement);
             }

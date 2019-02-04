@@ -9,7 +9,7 @@ namespace TimeMeasurement_Backend.Networking.MessageData
     public class Message<TCommands> where TCommands : Enum
     {
         /// <summary>
-        /// Command used to identify purpose of Message
+        /// Command used to identify the purpose of the Message
         /// </summary>
         public TCommands Command { get; set; }
 
