@@ -96,7 +96,7 @@ namespace TimeMeasurement_Backend.Logic
 
             //Every participant has finished => End Race
             // ReSharper disable once InvertIf
-            if (CurrentParticipants.All(r => r.Time != 0))
+            if (CurrentParticipants.All(r => r. Time != 0))
             {
                 RaceManager.Instance.CompleteRace();
                 _measurements.Clear();

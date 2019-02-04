@@ -28,7 +28,7 @@ namespace TimeMeasurement_Backend.Entities
         /// Link to the announcement of the race
         /// Has to be a valid URL  (RFC1738)
         /// </summary>
-        [IsUrl]
+        [RegularExpression(@"^(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$")]
         public string Link { get; set; }
 
         /// <summary>
